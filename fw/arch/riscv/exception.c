@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "exception.h"
 #include "assert.h"
 #include "csr.h"

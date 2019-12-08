@@ -29,12 +29,22 @@ void timer_sleep(int timeMs)
     while (timer_diff(timer_now(), t) < timeMs)
         ;
 }
+
+void timer_sleep_us(int timeUs)
+{
+   unsigned long t = cpu_timer_get_count();
+   unsigned long Timeout = timeUs * (CPU_KHZ / 1000);
+
+    while (cpu_timer_get_count() - t < Timeout)
+        ;
+}
+
 //--------------------------------------------------------------------------
 // timer_now:
 //--------------------------------------------------------------------------
 t_time timer_now(void)
 {
-	return cpu_timer_get_count() / CPU_KHZ;
+   return cpu_timer_get_count() / CPU_KHZ;
 }
 //--------------------------------------------------------------------------
 // times:

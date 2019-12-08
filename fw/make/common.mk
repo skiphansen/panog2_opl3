@@ -92,7 +92,7 @@ LFLAGS       += $(EXTRA_LIBS)
 src2obj       = $(OBJ_DIR)$(patsubst %$(suffix $(1)),%.o,$(notdir $(1)))
 src2dep       = $(DEP_DIR)$(patsubst %,%.d,$(notdir $(1)))
 
-SRC          := $(EXTRA_SRC) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp)) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.c))
+SRC          := $(BOOT_SRC) $(EXTRA_SRC) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp)) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.c))
 OBJ          ?= $(foreach src,$(SRC),$(call src2obj,$(src)))
 DEPS         ?= $(foreach src,$(SRC),$(call src2dep,$(src)))
 

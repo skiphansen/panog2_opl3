@@ -18,7 +18,7 @@ COMPILER = gcc
 # Platform
 ###############################################################################
 PLATFORM    ?= machine-fpga
-PLATFORM_DIR ?= $(TOPDIR)/src_c/arch/riscv
+PLATFORM_DIR ?= $(TOPDIR)/fw/arch/riscv
 
 BASE_ADDRESS ?= 0x80000000
 MEM_SIZE     ?= 65535
@@ -30,7 +30,7 @@ ARCH_CFLAGS += -DCONFIG_USE_LOCAL_STRING_H
 ARCH_LFLAGS += -Wl,--defsym=BASE_ADDRESS=$(BASE_ADDRESS)
 ARCH_LFLAGS += -Wl,--defsym=MEM_SIZE=$(MEM_SIZE)
 
-EXTRA_SRC += $(PLATFORM_DIR)/boot.S
+BOOT_SRC    := $(PLATFORM_DIR)/boot.S
 
 ###############################################################################
 # Link type (RAM or ROM)

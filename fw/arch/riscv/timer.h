@@ -22,5 +22,6 @@ void            timer_init(void);
 t_time          timer_now(void);
 static long     timer_diff(t_time a, t_time b) { return (long)(a - b); } 
 void            timer_sleep(int timeMs);
+void            timer_sleep_us(int timeUs);
 
 #endif

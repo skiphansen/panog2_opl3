@@ -1,0 +1,4 @@
+*.pyc
+build.*/
+dep.*/
+obj.*/

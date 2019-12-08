@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
     unsigned char Buf[256];
     int Id = 0;
 
-    LOG("Hello pano world!\n");
-
+    printf("Hello pano world!\n");
 
     return 0;
 }

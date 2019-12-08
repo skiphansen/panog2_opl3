@@ -16,7 +16,7 @@ def main(argv):
     parser.add_argument('-p', dest='progargs',default="",                         help='Program load argument string')
     args = parser.parse_args()
 
-    run_path = os.path.dirname(os.path.realpath(__file__)) + "/run"
+    run_path = os.path.dirname(os.path.realpath(__file__))
 
     cmd = "%s/poke.py -t %s -d %s -b %s -a 0xF0000000 -v 0x0" % (run_path, args.type, args.device, args.baud)
     print cmd

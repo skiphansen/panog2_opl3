@@ -15,6 +15,7 @@ EXTRA_CFLAGS += -DCONFIG_SPILITE_BASE=0x93000000
 TOPDIR	     = ../../
 SRC_DIR      = ./ 
 SRC_DIR     += $(TOPDIR)/fpga/core_soc/src_c
+SRC_DIR     += ../lib/libstd
 EXTRA_SRC   += ../common/i2c.c
 
 INCLUDE_PATH += ../common
@@ -26,6 +27,7 @@ TARGET_PORT ?= /dev/ttyUSB1
 RUN_PREFIX  := $(TOPDIR)/tools/run/run.py -d $(TARGET_PORT) -b 1000000 -f 
 
 MAKE_DIR=../make
+ENABLE_LST=yes
 
 include $(MAKE_DIR)/common.mk
 

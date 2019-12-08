@@ -1,6 +1,7 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "gpio_defs.h"
-#include "pano_time.h"
+#include "timer.h"
 #include "i2c.h"
 
 #define DEBUG_LOGGING
@@ -11,7 +12,7 @@
 
 // Slow I2C devices need 4.7 microseconds ... but the Pano doesn't have
 // any slow devices, but be safe.
-#define I2C_DLY() delay_us(5)
+#define I2C_DLY() timer_sleep_us(5)
 
 static void i2c_set_bit(ContextI2C *pCtx, int Value, int Bit)
 {
@@ -67,23 +68,23 @@ void i2c_init(ContextI2C *pCtx)
 
 void i2c_start(ContextI2C *pCtx)
 {
-   i2c_set_sda(Port, 1);             // i2c start bit sequence
+   i2c_set_sda(pCtx,1);             // i2c start bit sequence
    I2C_DLY();
-   i2c_set_scl(Port, 1);
+   i2c_set_scl(pCtx,1);
    I2C_DLY();
-   i2c_set_sda(Port, 0);
+   i2c_set_sda(pCtx,0);
    I2C_DLY();
-   i2c_set_scl(Port, 0);
+   i2c_set_scl(pCtx,0);
    I2C_DLY();
 }
 
 void i2c_stop(ContextI2C *pCtx)
 {
-   i2c_set_sda(Port, 0);             // i2c stop bit sequence
+   i2c_set_sda(pCtx,0);             // i2c stop bit sequence
    I2C_DLY();
-   i2c_set_scl(Port, 1);
+   i2c_set_scl(pCtx,1);
    I2C_DLY();
-   i2c_set_sda(Port, 1);
+   i2c_set_sda(pCtx,1);
    I2C_DLY();
 }
 
@@ -91,36 +92,36 @@ unsigned char i2c_rx(ContextI2C *pCtx, char ack)
 {
    char x, d=0;
 
-   i2c_set_sda(Port, 1);
+   i2c_set_sda(pCtx,1);
 
    for(x=0; x<8; x++) {
       d <<= 1;
 
-      i2c_set_scl(Port, 1);
+      i2c_set_scl(pCtx,1);
       I2C_DLY();
 
       // wait for any i2c_set_scl clock stretching
-      while(i2c_get_scl(Port) == 0);
+      while(i2c_get_scl(pCtx) == 0);
 
-      d |= i2c_get_sda(Port);
-      i2c_set_scl(Port, 0);
+      d |= i2c_get_sda(pCtx);
+      i2c_set_scl(pCtx,0);
       I2C_DLY();
    }
 
    if(ack) {
-      i2c_set_sda(Port, 0);
+      i2c_set_sda(pCtx,0);
    }
    else {
-      i2c_set_sda(Port, 1);
+      i2c_set_sda(pCtx,1);
    }
 
-   i2c_set_scl(Port, 1);
+   i2c_set_scl(pCtx,1);
    I2C_DLY();         // send (N)ACK bit
 
-   i2c_set_scl(Port, 0);
+   i2c_set_scl(pCtx,0);
    I2C_DLY();         // send (N)ACK bit
 
-   i2c_set_sda(Port, 1);
+   i2c_set_sda(pCtx,1);
    return d;
 }
 
@@ -131,21 +132,21 @@ int i2c_tx(ContextI2C *pCtx, unsigned char d)
    int bit;
 
    for(x=8; x; x--) {
-      i2c_set_sda(Port, (d & 0x80)>>7);
+      i2c_set_sda(pCtx,(d & 0x80)>>7);
       d <<= 1;
       I2C_DLY();
-      i2c_set_scl(Port, 1);
+      i2c_set_scl(pCtx,1);
       I2C_DLY();
-      i2c_set_scl(Port, 0);
+      i2c_set_scl(pCtx,0);
    }
-   i2c_set_sda(Port, 1);
+   i2c_set_sda(pCtx,1);
    I2C_DLY();
    I2C_DLY();
-   bit = i2c_get_sda(Port);         // possible ACK bit
-   i2c_set_scl(Port, 1);
+   bit = i2c_get_sda(pCtx);         // possible ACK bit
+   i2c_set_scl(pCtx,1);
    I2C_DLY();
 
-   i2c_set_scl(Port, 0);
+   i2c_set_scl(pCtx,0);
    I2C_DLY();
 
    return !bit;
@@ -156,10 +157,10 @@ int i2c_write_buf(ContextI2C *pCtx, uint8_t ADR, uint8_t* data, int len)
 {
    int ack;
 
-   i2c_start(Port);
-   ack = i2c_tx(Port, ADR);
+   i2c_start(pCtx);
+   ack = i2c_tx(pCtx,ADR);
    if(!ack) {
-      i2c_stop(Port);
+      i2c_stop(pCtx);
       ELOG("Error: No ack on adr\n");
       return 0;
    }
@@ -167,15 +168,15 @@ int i2c_write_buf(ContextI2C *pCtx, uint8_t ADR, uint8_t* data, int len)
 
    int i;
    for(i=0;i<len;++i) {
-      ack = i2c_tx(Port, data[i]);
+      ack = i2c_tx(pCtx,data[i]);
       if(!ack) {
          ELOG("Error: No data byte %d\n",i);
-         i2c_stop(Port);
+         i2c_stop(pCtx);
          return 0;
       }
    }
 
-   i2c_stop(Port);
+   i2c_stop(pCtx);
 
    return 1;
 }
@@ -184,26 +185,26 @@ int i2c_read_buf(ContextI2C *pCtx, uint8_t ADR, uint8_t *data, int len)
 {
    int ack;
 
-   i2c_start(Port);
+   i2c_start(pCtx);
 
-   ack = i2c_tx(Port, ADR | 1);
+   ack = i2c_tx(pCtx,ADR | 1);
    if(!ack) {
-      i2c_stop(Port);
+      i2c_stop(pCtx);
       return 0;
    }
 
    int i;
    for(i=0; i < len; ++i) {
-      data[i] = i2c_rx(Port, i != len-1);
+      data[i] = i2c_rx(pCtx,i != len-1);
    }
-   i2c_stop(Port);
+   i2c_stop(pCtx);
 
    return 1;
 }
 
 int i2c_write_reg_nr(ContextI2C *pCtx, uint8_t ADR, uint8_t reg_nr)
 {
-   return i2c_write_buf(Port, ADR, &reg_nr, 1);
+   return i2c_write_buf(pCtx,ADR, &reg_nr, 1);
 }
 
 // return 1: ACK, 0: NACK
@@ -211,37 +212,37 @@ int i2c_write_reg(ContextI2C *pCtx, uint8_t ADR, uint8_t reg_nr, uint8_t value)
 {
    uint8_t data[2] = { reg_nr, value };
 
-   return i2c_write_buf(Port, ADR, data, 2);
+   return i2c_write_buf(pCtx,ADR, data, 2);
 }
 
 int i2c_write_regs(ContextI2C *pCtx, uint8_t ADR, uint8_t reg_nr, uint8_t *values, int len)
 {
    int ack;
 
-   i2c_start(Port);
+   i2c_start(pCtx);
 
-   ack = i2c_tx(Port, ADR);
+   ack = i2c_tx(pCtx,ADR);
    if(!ack) {
-      i2c_stop(Port);
+      i2c_stop(pCtx);
       return 0;
    }
 
-   ack = i2c_tx(Port, reg_nr);
+   ack = i2c_tx(pCtx,reg_nr);
    if(!ack) {
-      i2c_stop(Port);
+      i2c_stop(pCtx);
       return 0;
    }
 
    int i;
    for(i=0;i<len;++i) {
-      ack = i2c_tx(Port, values[i]);
+      ack = i2c_tx(pCtx,values[i]);
       if(!ack) {
-         i2c_stop(Port);
+         i2c_stop(pCtx);
          return 0;
       }
    }
 
-   i2c_stop(Port);
+   i2c_stop(pCtx);
 
    return 1;
 }
@@ -252,11 +253,11 @@ int i2c_read_reg(ContextI2C *pCtx, uint8_t ADR, uint8_t reg_nr, uint8_t *value)
    int result;
 
    // Set ADRess to read
-   result = i2c_write_buf(Port, ADR, &reg_nr, 1);
+   result = i2c_write_buf(pCtx,ADR, &reg_nr, 1);
    if(!result)
       return 0;
 
-   result = i2c_read_buf(Port, ADR, value, 1);
+   result = i2c_read_buf(pCtx,ADR, value, 1);
    if(!result)
       return 0;
 
@@ -268,12 +269,12 @@ int i2c_read_regs(ContextI2C *pCtx, uint8_t ADR, uint8_t reg_nr, uint8_t *values
    int result;
 
    // Set ADRess to read
-   result = i2c_write_buf(Port, ADR, &reg_nr, 1);
+   result = i2c_write_buf(pCtx,ADR, &reg_nr, 1);
    if(!result) {
       return 0;
    }
 
-   result = i2c_read_buf(Port, ADR, values, len);
+   result = i2c_read_buf(pCtx,ADR, values, len);
    if(!result) {
       return 0;
    }
