@@ -15,27 +15,15 @@ PART_PACKAGE = fgg484
 PART_SPEED   = 2
 
 TOPDIR	     = ../../
-SOCDIR	     = $(TOPDIR)/soc/
 SRC_DIR      = .
 SRC_DIR     += ../common
-SRC_DIR     += $(SOCDIR)/core_soc/src_v
-SRC_DIR     += $(SOCDIR)/dbg_bridge/src_v
-SRC_DIR     += $(SOCDIR)/dbg_bridge/src_v
-SRC_DIR     += $(SOCDIR)/pano_cores/g2/opl3/src_v
+SRC_DIR     += ../core_soc/src_v
+SRC_DIR     += ../dbg_bridge/src_v
+SRC_DIR      += ../cpu/riscv/core/rv32i_spartan6
+SRC_DIR      += ../cpu/riscv/top_tcm_wrapper
+EXTRA_VFLAGS += CPU_SELECT_RISCV=1
 
 CORES_README = $(TOPDIR)/soc/core_soc/README.md
-
-
-# RISC-V
-ifeq ($(CPU),riscv)
-  SRC_DIR      += ../../cpu/riscv/core/$(RISCV_CORE)
-  SRC_DIR      += ../../cpu/riscv/top_tcm_wrapper
-  EXTRA_VFLAGS += CPU_SELECT_RISCV=1
-else
-  # Cortex M0
-  SRC_DIR      += ../../cpu/cortex_m0/src_v
-  EXTRA_VFLAGS += CPU_SELECT_ARMV6M=1
-endif
 
 .PHONY: init_and_build
 
