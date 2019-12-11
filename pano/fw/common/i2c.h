@@ -12,7 +12,7 @@ typedef struct {
    uint32_t BitSDA;
 } ContextI2C;
 
-void i2c_init(ContextI2C *pContext);
+int i2c_init(ContextI2C *pCtx);
 void i2c_dly();
 void i2c_start(ContextI2C *pContext);
 void i2c_stop(ContextI2C *pContext);

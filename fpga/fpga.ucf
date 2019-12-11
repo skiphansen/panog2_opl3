@@ -67,9 +67,9 @@ NET "uart_rxd_o"  LOC="AB19" | IOSTANDARD=LVTTL;        # AKA DDC2_SDA
 NET "GMII_RST_N" LOC = R11 | IOSTANDARD = LVCMOS33;
 
 # Pano Button LED Output, Active High
-#NET "led_red"               LOC = E12 | IOSTANDARD = LVCMOS33;
+NET "led_red"               LOC = E12 | IOSTANDARD = LVCMOS33;
 NET "led_blue"              LOC = H13 | IOSTANDARD = LVCMOS33;
-#NET "led_green"             LOC = F13 | IOSTANDARD = LVCMOS33;
+NET "led_green"             LOC = F13 | IOSTANDARD = LVCMOS33;
 
 # Pano Button Input, Active Low
 #NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33;
@@ -81,6 +81,6 @@ NET "led_blue"              LOC = H13 | IOSTANDARD = LVCMOS33;
 #NET "codec_daclrc" LOC = U6 | IOSTANDARD = LVCMOS33;
 #NET "codec_dacdat" LOC = Y14 | IOSTANDARD = LVCMOS33;
 #NET "codec_mclk" LOC = W14 | IOSTANDARD = LVCMOS33;
-#NET "codec_scl" LOC = U17 | IOSTANDARD = LVCMOS33;
-#NET "codec_sda" LOC = AB17 | IOSTANDARD = LVCMOS33;
+NET "codec_scl" LOC = U17 | IOSTANDARD = LVCMOS33;
+NET "codec_sda" LOC = AB17 | IOSTANDARD = LVCMOS33;
 

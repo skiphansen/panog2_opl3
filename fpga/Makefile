@@ -14,31 +14,32 @@ PART_NAME    ?= xc6slx150
 PART_PACKAGE = fgg484
 PART_SPEED   = 2
 
-TOPDIR	     = ../../
-SRC_DIR      = .
-SRC_DIR     += ../common
-SRC_DIR     += ../core_soc/src_v
-SRC_DIR     += ../dbg_bridge/src_v
-SRC_DIR      += ../cpu/riscv/core/rv32i_spartan6
-SRC_DIR      += ../cpu/riscv/top_tcm_wrapper
+TOPDIR	      = ../
+PANO_DIR      = $(TOPDIR)/pano
+MAKE_DIR      = $(PANO_DIR)/make
+CORES_DIR     = $(TOPDIR)/cores
+SRC_DIR       = .
+SRC_DIR      += $(CORES_DIR)/core_soc/src_v
+SRC_DIR      += $(CORES_DIR)/dbg_bridge/src_v
+SRC_DIR      += $(CORES_DIR)/cpu/riscv/core/$(RISCV_CORE)
+SRC_DIR      += $(CORES_DIR)/cpu/riscv/top_tcm_wrapper
 EXTRA_VFLAGS += CPU_SELECT_RISCV=1
 
-CORES_README = $(TOPDIR)/soc/core_soc/README.md
+COMPRESS_BITFILE = yes
 
 .PHONY: init_and_build
 
-init_and_build: ${CORES_README} all
-
-include ../common/makefile.fpga_ise
+include $(MAKE_DIR)/fpga_ise.mk
 
 BIT_FILE = project/${PROJECT}_routed.bit
+
 load:
 	$(XC3SPROG) $(XC3SPROG_OPTS) ${BIT_FILE}
 
 prog_fpga:
 	$(XC3SPROG) $(XC3SPROG_OPTS) -Ixc3sprog/$(PART_NAME).bit ${BIT_FILE}
 
-${CORES_README}:
-	git submodule init
-	git submodule update
+#${CORES_README}:
+#	git submodule init
+#	git submodule update
 

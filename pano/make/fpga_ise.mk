@@ -57,6 +57,9 @@ $(PROJECT_DIR)/$(PROJECT).ut: | $(PROJECT_DIR)
 	@echo "-g Security:None" >> $@
 	@echo "-g DonePipe:No" >> $@
 	@echo "-g DriveDone:No" >> $@
+ifeq ($(COMPRESS_BITFILE), yes)
+	@echo "-g Compress" >> $@
+endif
 
 ###############################################################################
 # PROJECT.xst

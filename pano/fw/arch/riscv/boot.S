@@ -77,6 +77,9 @@ bss_clear:
     la a1, arg_argv
     jal main
 
+_die:
+    j _die
+
     # Exit    
     jal _exit
 
@@ -87,4 +90,4 @@ bss_clear:
 _exit:
     csrw dscratch, x0
 _exit_loop:
-    jal _exit_loop
+    j _exit_loop

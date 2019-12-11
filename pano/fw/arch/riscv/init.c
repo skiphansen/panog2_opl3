@@ -13,11 +13,10 @@
 
 #ifdef CONFIG_MALLOC
 #include "malloc.h"
-#endif
-
-#ifdef CONFIG_MALLOC
 static uint8_t _heap[CONFIG_MALLOC_SIZE];
 #endif
+
+#include "printf.h"
 
 //-----------------------------------------------------------------
 // init:

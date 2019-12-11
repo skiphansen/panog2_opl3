@@ -1,10 +1,10 @@
+#include <stdio.h>
 #include <stdint.h>
-#include "pano_io.h"
-
-#include "audio.h"
 
 #include "i2c.h"
-// #define DEBUG_LOGGING
+#include "audio.h"
+#include "pano_io.h"
+#define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 // #define LOG_TO_BOTH
 #include "log.h"
@@ -148,18 +148,15 @@ short int audio_registers[][2] = {
 };
 
 
-void audio_init()
+void audio_init(ContextI2C *pCtx)
 {
-//    i2c_test(CODEC_I2C_ADR);
-    i2c_init(CODEC_I2C_ADR);
-
     int idx = 0;
     while(audio_registers[idx][0] != -1){
         int addr  = audio_registers[idx][0];
         int value = audio_registers[idx][1];
 
         VLOG("0x%x -> 0x%x\n",value,addr);
-        if(!i2c_write_reg(CODEC_I2C_ADR, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
+        if(!i2c_write_reg(pCtx, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
             ELOG("i2c_write_reg failed\n");
            break;
         }

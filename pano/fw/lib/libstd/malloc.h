@@ -16,12 +16,12 @@
 //-----------------------------------------------------------------
 // Prototypes
 //-----------------------------------------------------------------
-void		malloc_init( void *heap, size_t len, int (*fn_lock)(void), void (*fn_unlock)(int l) );
-void*		malloc( size_t size );
-void		free( void *ptr );
-void*		calloc( size_t size );
-size_t	    malloc_largest_free_size(void);
-size_t	    malloc_total_free(void);
+void     malloc_init( void *heap, size_t len, int (*fn_lock)(void), void (*fn_unlock)(int l) );
+void*    malloc( size_t size );
+void     free( void *ptr );
+void*    calloc(size_t nmemb, size_t size);
+size_t       malloc_largest_free_size(void);
+size_t       malloc_total_free(void);
 
 #endif
 

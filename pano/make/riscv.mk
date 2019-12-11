@@ -18,7 +18,7 @@ COMPILER = gcc
 # Platform
 ###############################################################################
 PLATFORM    ?= machine-fpga
-PLATFORM_DIR ?= $(TOPDIR)/fw/arch/riscv
+PLATFORM_DIR ?= $(PANO_FW_DIR)/arch/riscv
 
 BASE_ADDRESS ?= 0x80000000
 MEM_SIZE     ?= 65535

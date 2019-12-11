@@ -7,8 +7,8 @@
 #define DEBUG_LOGGING
 #include "log.h"
 
-#define REG_WR(reg, wr_data)       *((volatile uint8_t *)reg) = (wr_data)
-#define REG_RD(reg)                *((volatile uint8_t *)reg)
+#define REG_WR(reg, wr_data)       *((volatile uint32_t *)(reg)) = (wr_data)
+#define REG_RD(reg)                *((volatile uint32_t *)(reg))
 
 // Slow I2C devices need 4.7 microseconds ... but the Pano doesn't have
 // any slow devices, but be safe.
@@ -16,7 +16,7 @@
 
 static void i2c_set_bit(ContextI2C *pCtx, int Value, int Bit)
 {
-   uint32_t Temp = REG_RD(pCtx->GpioBase + (GPIO_DIRECTION/4));
+   uint32_t Temp = REG_RD(pCtx->GpioBase + GPIO_DIRECTION);
    if(Value) {
    // set direction to input for high bit
       Temp &= ~Bit;
@@ -25,7 +25,7 @@ static void i2c_set_bit(ContextI2C *pCtx, int Value, int Bit)
    // set direction to output for low bit
       Temp |= Bit;
    }
-   REG_WR(pCtx->GpioBase + (GPIO_DIRECTION/4),Temp);
+   REG_WR(pCtx->GpioBase + GPIO_DIRECTION,Temp);
 }
 
 static void i2c_set_scl(ContextI2C *pCtx, int Value)
@@ -41,7 +41,7 @@ static void i2c_set_sda(ContextI2C *pCtx, int Value)
 
 static int i2c_get_bit(ContextI2C *pCtx,int Bit)
 {
-   uint32_t Temp = REG_RD(pCtx->GpioBase + (GPIO_INPUT/4));
+   uint32_t Temp = REG_RD(pCtx->GpioBase + GPIO_INPUT);
    return (Temp & Bit) ? 1 : 0;
 }
 
@@ -55,16 +55,27 @@ static int i2c_get_sda(ContextI2C *pCtx)
    return i2c_get_bit(pCtx,pCtx->BitSDA);
 }
 
-void i2c_init(ContextI2C *pCtx)
+int i2c_init(ContextI2C *pCtx)
 {
+   int Ret = 0;   // assume the best
+
    i2c_set_sda(pCtx,1);
    i2c_set_scl(pCtx,1);
 // Precondition output data to zeros for SCL, SDA bits
-   REG_WR(pCtx->GpioBase + (GPIO_OUTPUT_CLR/4),pCtx->BitSCL);
-   REG_WR(pCtx->GpioBase + (GPIO_OUTPUT_CLR/4),pCtx->BitSDA);
+   REG_WR(pCtx->GpioBase + GPIO_OUTPUT_CLR,pCtx->BitSCL);
+   REG_WR(pCtx->GpioBase + GPIO_OUTPUT_CLR,pCtx->BitSDA);
    I2C_DLY();
-}
+   if(i2c_get_scl(pCtx) != 1) {
+      ELOG("Failed, SCL not high after init\n");
+      Ret = 1;
+   }
+   if(i2c_get_sda(pCtx) != 1) {
+      ELOG("Failed, SDA not high after init\n");
+      Ret = 1;
+   }
 
+   return Ret;
+}
 
 void i2c_start(ContextI2C *pCtx)
 {

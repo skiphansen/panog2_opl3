@@ -44,9 +44,7 @@ else
   ARCH_TGT_DIR=linux
 endif
 
-OBJ_DIR      ?= obj.$(ARCH_TGT_DIR).$(TARGET)/
-DEP_DIR      ?= dep.$(ARCH_TGT_DIR).$(TARGET)/
-EXE_DIR      ?= build.$(ARCH_TGT_DIR).$(TARGET)/
+BUILD_DIR      ?= build
 
 ###############################################################################
 # Variables: GCC
@@ -84,13 +82,14 @@ CFLAGS       += $(EXTRA_CFLAGS)
 LFLAGS       += $(ARCH_LFLAGS)
 LFLAGS       += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LFLAGS       += $(EXTRA_LIBS)
+LFLAGS 	     += -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
 
 ###############################################################################
 # Variables: Lists of objects, source and deps
 ###############################################################################
 # SRC / Object list
-src2obj       = $(OBJ_DIR)$(patsubst %$(suffix $(1)),%.o,$(notdir $(1)))
-src2dep       = $(DEP_DIR)$(patsubst %,%.d,$(notdir $(1)))
+src2obj       = $(BUILD_DIR)/$(patsubst %$(suffix $(1)),%.o,$(notdir $(1)))
+src2dep       = $(BUILD_DIR)/$(patsubst %,%.d,$(notdir $(1)))
 
 SRC          := $(BOOT_SRC) $(EXTRA_SRC) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp)) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.c))
 OBJ          ?= $(foreach src,$(SRC),$(call src2obj,$(src)))
@@ -103,7 +102,7 @@ DEPS         ?= $(foreach src,$(SRC),$(call src2dep,$(src)))
 DEPFLAGS      = -MT $$@ -MMD -MP -MF $(call src2dep,$(1))
 
 define template_c
-$(call src2obj,$(1)): $(1) | $(OBJ_DIR) $(DEP_DIR)
+$(call src2obj,$(1)): $(1) | $(BUILD_DIR)/ $(BUILD_DIR)/
 	@echo "# Compiling $(notdir $(1))"
 	$(GCC) $(CFLAGS) $(DEPFLAGS) -c $$< -o $$@
 endef
@@ -111,39 +110,42 @@ endef
 ###############################################################################
 # Rules
 ###############################################################################
-BUILD_TARGETS = $(EXE_DIR)$(TARGET)
+BUILD_TARGETS = $(BUILD_DIR)/$(TARGET)
 
 ifeq ($(ENABLE_BIN),yes)
-  BUILD_TARGETS += $(EXE_DIR)$(TARGET).bin
+  BUILD_TARGETS += $(BUILD_DIR)/$(TARGET).bin
 endif
 ifeq ($(ENABLE_LST),yes)
-  BUILD_TARGETS += $(EXE_DIR)$(TARGET).lst
+  BUILD_TARGETS += $(BUILD_DIR)/$(TARGET).lst
 endif
 
 all: $(BUILD_TARGETS)
 
-$(OBJ_DIR) $(DEP_DIR) $(EXE_DIR):
+$(BUILD_DIR)/:
 	@mkdir -p $@
 
 $(foreach src,$(SRC),$(eval $(call template_c,$(src))))
 
-$(EXE_DIR)$(TARGET): $(OBJ) | $(EXE_DIR) 
+$(BUILD_DIR)/$(TARGET): $(OBJ) | $(BUILD_DIR)/ 
 	@echo "# Building $(notdir $@)"
-	$(GCC) -o $(EXE_DIR)$(TARGET) $(OBJ) $(LFLAGS)
+	$(GCC) -o $(BUILD_DIR)/$(TARGET) $(OBJ) $(LFLAGS)
 
-$(EXE_DIR)$(TARGET).bin: $(EXE_DIR)$(TARGET)
+$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
 	$(OBJCOPY) -O binary $< $@
 
-$(EXE_DIR)$(TARGET).lst: $(EXE_DIR)$(TARGET)
+$(BUILD_DIR)/$(TARGET).lst: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
 	$(OBJDUMP) -d $< > $@
 
 run:
-	$(RUN_PREFIX) $(EXE_DIR)$(TARGET) $(RUN_ARGS)
+	$(RUN_PREFIX) $(BUILD_DIR)/$(TARGET) $(RUN_ARGS)
 
 clean:
-	rm -rf $(EXE_DIR) $(OBJ_DIR) $(DEP_DIR) $(CLEAN_FILES)
+	rm -rf $(BUILD_DIR)
+
+load:
+	make -C $(TOPDIR)/fpga load
 
 ###############################################################################
 # Rules: Dependancies
