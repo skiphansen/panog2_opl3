@@ -48,14 +48,14 @@ IBUFG clkin1_buf
 
 PLL_BASE
     #(.BANDWIDTH              ("OPTIMIZED"),
-      .CLKFBOUT_MULT          (18),
+      .CLKFBOUT_MULT          (32),
       .CLKFBOUT_PHASE         (0.000),
       .CLK_FEEDBACK           ("CLKFBOUT"),
       .CLKIN_PERIOD           (8.000),
       .COMPENSATION           ("SYSTEM_SYNCHRONOUS"),
       .DIVCLK_DIVIDE          (5),
       .REF_JITTER             (0.010),
-      .CLKOUT0_DIVIDE         (6),
+      .CLKOUT0_DIVIDE         (25),
       .CLKOUT0_DUTY_CYCLE     (0.500),
       .CLKOUT0_PHASE          (0.000),
       .CLKOUT1_DIVIDE         (18),
@@ -122,7 +122,7 @@ wire [31:0] gpio_out_en_w;
 
 fpga_top
 #(
-    .CLK_FREQ(75000000)
+    .CLK_FREQ(32000000)
    ,.BAUDRATE(1000000)   // SoC UART baud rate
    ,.UART_SPEED(1000000) // Debug bridge UART baud (should match BAUDRATE)
    ,.C_SCK_RATIO(2)      // SPI clock divider (M25P128 maxclock = 54 Mhz)
