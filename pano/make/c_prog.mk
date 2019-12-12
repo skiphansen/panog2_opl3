@@ -144,7 +144,7 @@ $(BUILD_DIR)/$(TARGET).lst: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
 	$(OBJDUMP) -d $< > $@
 
-run:
+run: $(BUILD_DIR)/$(TARGET)
 	$(RUN_PREFIX) $(BUILD_DIR)/$(TARGET) $(RUN_ARGS)
 
 clean:

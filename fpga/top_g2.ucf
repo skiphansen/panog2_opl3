@@ -72,7 +72,7 @@ NET "led_blue"              LOC = H13 | IOSTANDARD = LVCMOS33;
 NET "led_green"             LOC = F13 | IOSTANDARD = LVCMOS33;
 
 # Pano Button Input, Active Low
-#NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33;
+NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33 | PULLUP;
 
 # Wolfson codec audio interface
 #NET "codec_bclk" LOC = AB13 | IOSTANDARD = LVCMOS33;

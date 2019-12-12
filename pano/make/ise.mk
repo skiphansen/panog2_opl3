@@ -208,6 +208,7 @@ $(BIT_FILE): $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 	@echo "# ISE: Create bitstream"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/bitgen -f $(PROJECT).ut $(PROJECT)_routed.ncd
+	@cp $(BIT_FILE) $(PROJECT).bit
 
 ###############################################################################
 # Rule: Bitstream -> binary
@@ -222,7 +223,7 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 # Rule: Load Bitstream using XC2PROG
 ###############################################################################
 load:
-	$(XC3SPROG) $(XC3SPROG_OPTS) ${BIT_FILE}
+	$(XC3SPROG) $(XC3SPROG_OPTS) $(PROJECT).bit
 
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG
