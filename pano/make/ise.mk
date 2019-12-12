@@ -1,14 +1,39 @@
 ###############################################################################
 ## Params
 ###############################################################################
-SRC_DIR      ?= .
+XILINX_ISE ?= /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64
 EXTRA_VFLAGS ?= 
-PROJECT_DIR  ?= project
+PROJECT_DIR  ?= build
 PROJECT      ?= fpga
 
-PART_NAME    ?= xc6slx9
-PART_PACKAGE ?= tqg144
-PART_SPEED   ?= 3
+###############################################################################
+# Checks
+###############################################################################
+ifeq ($(TOPDIR),)
+$(error TOPDIR not set)
+endif
+
+ifeq ($(PANO_SERIES),)
+$(error PANO_SERIES not set)
+endif
+
+ifeq ($(PANO_SERIES),g2)
+  ifeq ($(PANO_REV_C),yes)
+    PART_NAME    = xc6slx100
+    PART_PACKAGE = fgg484
+    PART_SPEED   = 2
+  else
+    PART_NAME    = xc6slx150
+    PART_PACKAGE = fgg484
+    PART_SPEED   = 2
+  endif
+endif
+
+ifeq ($(PART_NAME),)
+$(error unknown PANO_SERIES $(PANO_SERIES))
+endif
+
+include $(TOPDIR)/pano/make/common.mk
 
 TOP_MODULE   ?= top
 
@@ -17,14 +42,19 @@ $(error "XILINX_ISE not set - e.g. export XILINX_ISE=/opt/Xilinx/14.7/ISE_DS/ISE
 endif
 TOOL_PATH    := $(XILINX_ISE)
 
-UCF_FILE     ?= fpga.ucf
+UCF_FILE  = $(PROJECT_DIR)/$(PROJECT).ucf
+UCF_FILES := $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*_$(PANO_SERIES).ucf))
+SRC_FILES := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))
 
 ###############################################################################
 # Rules:
 ###############################################################################
 all: bitstream
 
-bitstream: $(PROJECT_DIR)/$(PROJECT)_routed.bit
+BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
+BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit   
+
+bitstream: $(BIT_FILE)
 
 clean:
 	rm -rf $(PROJECT_DIR)
@@ -120,9 +150,15 @@ $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 ###############################################################################
 # PROJECT.prj
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
+$(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst $(SRC_FILES)
 	@touch $@
-	@$(foreach _dir,$(SRC_DIR), $(foreach _file,$(wildcard $(_dir)/*.v),echo "verilog work \"$(abspath $(_file))\"" >> $@;))
+	@$(foreach _file,$(SRC_FILES),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
+
+###############################################################################
+# PROJECT.ucf
+###############################################################################
+$(UCF_FILE): $(UCF_FILES)
+	cat $^ > $@
 
 ###############################################################################
 # Rule: Synth
@@ -137,7 +173,7 @@ $(PROJECT_DIR)/$(PROJECT).ngc: $(PROJECT_DIR)/$(PROJECT).prj
 ###############################################################################
 # Rule: Convert netlist
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_DIR)/$(PROJECT).ngc
+$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_DIR)/$(PROJECT).ngc $(UCF_FILE)
 	@echo "####################################################################"
 	@echo "# ISE: Convert netlist"
 	@echo "####################################################################"
@@ -167,7 +203,7 @@ $(PROJECT_DIR)/$(PROJECT)_routed.ncd: $(PROJECT_DIR)/$(PROJECT).ncd
 ###############################################################################
 # Rule: Bitstream
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT)_routed.bit: $(PROJECT_DIR)/$(PROJECT)_routed.ncd
+$(BIT_FILE): $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 	@echo "####################################################################"
 	@echo "# ISE: Create bitstream"
 	@echo "####################################################################"
@@ -176,9 +212,22 @@ $(PROJECT_DIR)/$(PROJECT)_routed.bit: $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 ###############################################################################
 # Rule: Bitstream -> binary
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).bin: $(PROJECT_DIR)/$(PROJECT)_routed.bit
+$(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 	@echo "####################################################################"
 	@echo "# ISE: Convert bitstream"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/promgen -u 0x0 $(PROJECT)_routed.bit -p bin -w -b -o $(PROJECT).bin
+
+###############################################################################
+# Rule: Load Bitstream using XC2PROG
+###############################################################################
+load:
+	$(XC3SPROG) $(XC3SPROG_OPTS) ${BIT_FILE}
+
+###############################################################################
+# Rule: Program Bitstream into SPI flash using XC2PROG
+###############################################################################
+prog_fpga:
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) ${BIT_FILE}
+
 

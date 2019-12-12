@@ -125,7 +125,7 @@ fpga_top
     .CLK_FREQ(75000000)
    ,.BAUDRATE(1000000)   // SoC UART baud rate
    ,.UART_SPEED(1000000) // Debug bridge UART baud (should match BAUDRATE)
-   ,.C_SCK_RATIO(50)     // SPI clock divider (SPI_CLK=CLK_FREQ/C_SCK_RATIO)
+   ,.C_SCK_RATIO(2)      // SPI clock divider (M25P128 maxclock = 54 Mhz)
    ,.CPU("riscv")        // riscv or armv6m
 )
 u_top
