@@ -5,7 +5,7 @@
 #include "audio.h"
 #include "pano_io.h"
 #define DEBUG_LOGGING
-// #define VERBOSE_DEBUG_LOGGING
+#define VERBOSE_DEBUG_LOGGING
 // #define LOG_TO_BOTH
 #include "log.h"
 

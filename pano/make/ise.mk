@@ -208,7 +208,9 @@ $(BIT_FILE): $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 	@echo "# ISE: Create bitstream"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/bitgen -f $(PROJECT).ut $(PROJECT)_routed.ncd
-	@cp $(BIT_FILE) $(PROJECT).bit
+
+$(PREBUILT_DIR)/$(PROJECT).bit: $(BIT_FILE)
+	@cp $(BIT_FILE) $(PREBUILT_DIR)/$(PROJECT).bit
 
 ###############################################################################
 # Rule: Bitstream -> binary
@@ -222,13 +224,13 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 ###############################################################################
 # Rule: Load Bitstream using XC2PROG
 ###############################################################################
-load:
-	$(XC3SPROG) $(XC3SPROG_OPTS) $(PROJECT).bit
+load: $(PREBUILT_DIR)/$(PROJECT).bit
+	$(XC3SPROG) $(XC3SPROG_OPTS) $(PREBUILT_DIR)/$(PROJECT).bit
 
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG
 ###############################################################################
-prog_fpga:
-	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) ${BIT_FILE}
+prog_fpga: $(PREBUILT_DIR)/$(PROJECT).bit
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/$(PROJECT).bit
 
 

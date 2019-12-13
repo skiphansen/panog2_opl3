@@ -99,9 +99,11 @@ void LogPutc(char c,void * arg);
    #define VLOG(format, ...) if(!(gLogFlags & LOG_VERBOSE_DISABLED)) _LOG(_VLOG_FLAGS,"%s: " format,__FUNCTION__ ,## __VA_ARGS__)
    // LOG_R - raw debug messages (function name prefix not added) 
    #define VLOG_R(format, ...) if(!(gLogFlags & LOG_VERBOSE_DISABLED)) _LOG(_VLOG_FLAGS,format,## __VA_ARGS__)
+   #define VLOG_HEX(x,y) LogHex(_LOG_FLAGS,x,y)
 #else
    #define VLOG(format, ...)
    #define VLOG_R(format, ...)
+   #define VLOG_HEX(x,y)
 #endif
 
 #endif   // _LOG_H_

@@ -32,6 +32,9 @@ COMPRESS_BITFILE = yes
 .PHONY: init_and_build
 
 TOPDIR = ..
+prog_fs:
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/dro_test_spiffs.img:W:9043968:bin
+
 include $(TOPDIR)/pano/make/ise.mk
 
 #${CORES_README}:

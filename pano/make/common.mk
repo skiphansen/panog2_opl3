@@ -5,6 +5,7 @@ PANO_CORES_DIR = $(PANO_DIR)/cores
 PANO_FW_DIR  = $(PANO_DIR)/fw
 TOOLS_DIR    = $(PANO_DIR)/tools
 MAKE_DIR     = $(PANO_DIR)/make
+PREBUILT_DIR = $(TOPDIR)/prebuilt
 
 # xc3sprog related
 CABLE 	      ?= jtaghs2
