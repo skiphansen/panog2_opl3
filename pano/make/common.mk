@@ -1,11 +1,17 @@
+MAKE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+ifeq ($(TOPDIR),)
+   $(error TOPDIR not set)
+endif
+
 # directory related
-CORES_DIR    = $(TOPDIR)/cores
-PANO_DIR     = $(TOPDIR)/pano
-PANO_CORES_DIR = $(PANO_DIR)/cores
-PANO_FW_DIR  = $(PANO_DIR)/fw
-TOOLS_DIR    = $(PANO_DIR)/tools
-MAKE_DIR     = $(PANO_DIR)/make
-PREBUILT_DIR = $(TOPDIR)/prebuilt
+CORES_DIR    := $(TOPDIR)/cores
+PANO_DIR     := $(TOPDIR)/pano
+PANO_CORES_DIR := $(PANO_DIR)/cores
+PANO_FW_DIR  := $(PANO_DIR)/fw
+TOOLS_DIR    := $(PANO_DIR)/tools
+CPU_CORE_DIR := $(CORES_DIR)/cpu/riscv
+PREBUILT_DIR := $(TOPDIR)/prebuilt
 
 # xc3sprog related
 CABLE 	      ?= jtaghs2

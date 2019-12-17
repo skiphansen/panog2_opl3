@@ -48,7 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module operator (
     input wire clk,

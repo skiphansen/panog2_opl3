@@ -1,13 +1,14 @@
 
+
 module audio(
     input wire  clk25,
     input wire  reset25,
 
-    input wire audio_bclk,
-    output reg  audio_dacdat,
-    output reg  audio_daclrc,
-    input  wire audio_adcdat,
-    output reg  audio_adclrc,
+    input wire codec_bclk_i,
+    output reg  codec_dacdat,
+    output reg  codec_daclrc,
+    input  wire codec_adcdat,
+    output reg  codec_adclrc,
     input  wire [15:0] audio_right_sample,
     input  wire [15:0] audio_left_sample,
     input  wire audio_sample_clk
@@ -33,7 +34,7 @@ module audio(
 
     always @(posedge clk25) 
     begin
-        last_bclk <= audio_bclk;
+        last_bclk <= codec_bclk_i;
         if (last_audio_sample_clk != audio_sample_clk) begin
             last_audio_sample_clk <= audio_sample_clk;
         // rising edge of sample clock, start new cycle
@@ -42,29 +43,29 @@ module audio(
             end
         end
 
-        if(audio_bclk && !last_bclk) begin
+        if(codec_bclk_i && !last_bclk) begin
         end
-        else if(!audio_bclk && last_bclk) begin
-            audio_daclrc    <= 0;
+        else if(!codec_bclk_i && last_bclk) begin
+            codec_daclrc    <= 0;
             if(start_cycle) begin
                 start_cycle <= 0;
                 bit_cntr     <= 1;
-                audio_daclrc <= 1;
-                audio_dacdat <= audio_left_sample[15];
+                codec_daclrc <= 1;
+                codec_dacdat <= audio_left_sample[15];
             end
             else if (bit_cntr < 16) begin
                 bit_cntr <= bit_cntr + 1;
-                audio_dacdat <= audio_left_sample[~bit_cntr[3:0]];
+                codec_dacdat <= audio_left_sample[~bit_cntr[3:0]];
             end
             else if (bit_cntr < 32) begin
                 bit_cntr <= bit_cntr + 1;
-                audio_dacdat <= audio_right_sample[~bit_cntr[3:0]];
+                codec_dacdat <= audio_right_sample[~bit_cntr[3:0]];
             end
         end
 
         if (reset25) begin
             bit_cntr        <= 6'd32;
-            audio_adclrc    <= 0;
+            codec_adclrc    <= 0;
             last_audio_sample_clk <= 0;
             start_cycle <= 0;
             last_bclk <= 0;

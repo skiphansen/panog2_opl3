@@ -10,7 +10,7 @@
 #include "i2c.h"
 #include "audio.h"
 #include "timer.h"
-#include "pano_io.h"
+#include "opl3_drv.h"
 
 #define DEBUG_LOGGING
 #include "log.h"
@@ -21,9 +21,8 @@ ContextI2C gI2cCtx = {
    .BitSDA = GPIO_BIT_CODEC_SDA
 };
 
+void SinTest(void);
 
-#define REG_WR(reg, wr_data)       *((volatile uint32_t *)(reg)) = (wr_data)
-#define REG_RD(reg)                *((volatile uint32_t *)(reg))
 
 //-----------------------------------------------------------------
 // main
@@ -44,6 +43,7 @@ int main(int argc, char *argv[])
     }
     else {
        audio_init(&gI2cCtx);
+       SinTest();
     }
 
     for( ; ; );
@@ -51,24 +51,105 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#ifndef LOGGING_DISABLED
-void LogHex(char *LogFlags,void *Data,int Len)
+
+#define BANK   0
+// initialize OPL3 registers for a 1kHz sine wave
+struct {
+   uint8_t Bank;
+   uint8_t Reg;
+   uint8_t Value;
+} InitData[] = {
+//    {1, 0x05, 0x01 }, // enable OPL3 mode
+
+   {BANK,  0x20, 0x21 }, // OP1 Control Flags/Multiplier
+   {BANK,  0x23, 0x21 }, // OP2 Control Flags/Multiplier
+   {BANK,  0x28, 0x21 }, // OP3 Control Flags/Multiplier
+   {BANK,  0x2b, 0x21 }, // OP4 Control Flags/Multiplier
+
+   {BANK,  0x40, 0x08 }, // OP1 KSL/TL
+#if 0                         //
+   {BANK,  0x43, 0x3f }, // OP2 KSL/TL (muted)
+   {BANK,  0x48, 0x3f }, // OP3 KSL/TL (muted)
+   {BANK,  0x4b, 0x3f }, // OP4 KSL/TL (muted)
+#endif
+
+   {BANK,  0x60, 0x88 }, // OP1 AR/DR
+   {BANK,  0x63, 0x88 }, // OP2 AR/DR
+   {BANK,  0x68, 0x88 }, // OP3 AR/DR
+   {BANK,  0x6b, 0x88 }, // OP4 AR/DR
+
+   {BANK,  0x80, 0x00 }, // OP1 SL/RR
+   {BANK,  0x83, 0x00 }, // OP2 SL/RR
+   {BANK,  0x88, 0x00 }, // OP3 SL/RR
+   {BANK,  0x8b, 0x00 }, // OP4 SL/RR
+
+   {BANK,  0xe0, 0x00 }, // OP1 Waveform
+   {BANK,  0xe3, 0x00 }, // OP2 Waveform
+   {BANK,  0xe8, 0x00 }, // OP3 Waveform
+   {BANK,  0xeb, 0x00 }, // OP4 Waveform
+
+   {BANK,  0xc0, 0x01 }, // Channels/Connections/Feedback
+   {BANK,  0xc3, 0x00 }, // Channels/Connections/Feedback
+
+// FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+
+   {BANK,  0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+   {BANK,  0xb0, 0x3c }, // KON/Block/FNUM_H
+
+#if 0
+#undef BANK
+#define BANK   1
+
+   {BANK,  0x20, 0x21 }, // OP1 Control Flags/Multiplier
+   {BANK,  0x23, 0x21 }, // OP2 Control Flags/Multiplier
+   {BANK,  0x28, 0x21 }, // OP3 Control Flags/Multiplier
+   {BANK,  0x2b, 0x21 }, // OP4 Control Flags/Multiplier
+
+   {BANK,  0x40, 0x00 }, // OP1 KSL/TL
+   {BANK,  0x43, 0x3f }, // OP2 KSL/TL (muted)
+   {BANK,  0x48, 0x3f }, // OP3 KSL/TL (muted)
+   {BANK,  0x4b, 0x3f }, // OP4 KSL/TL (muted)
+
+   {BANK,  0x60, 0x88 }, // OP1 AR/DR
+   {BANK,  0x63, 0x88 }, // OP2 AR/DR
+   {BANK,  0x68, 0x88 }, // OP3 AR/DR
+   {BANK,  0x6b, 0x88 }, // OP4 AR/DR
+
+   {BANK,  0x80, 0x00 }, // OP1 SL/RR
+   {BANK,  0x83, 0x00 }, // OP2 SL/RR
+   {BANK,  0x88, 0x00 }, // OP3 SL/RR
+   {BANK,  0x8b, 0x00 }, // OP4 SL/RR
+
+   {BANK,  0xe0, 0x00 }, // OP1 Waveform
+   {BANK,  0xe3, 0x00 }, // OP2 Waveform
+   {BANK,  0xe8, 0x00 }, // OP3 Waveform
+   {BANK,  0xeb, 0x00 }, // OP4 Waveform
+
+   {BANK,  0xc0, 0x31 }, // Channels/Connections/Feedback
+   {BANK,  0xc3, 0x30 }, // Channels/Connections/Feedback
+
+// FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+
+   {BANK,  0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+   {BANK,  0xb0, 0x38 }, // KON/Block/FNUM_H
+#endif
+   {0xff}   // end of table
+};
+
+
+void SinTest()
 {
    int i;
-   uint8_t *cp = (uint8_t *) Data;
+   int j;
 
-   for(i = 0; i < Len; i++) {
-      if(i != 0 && (i & 0xf) == 0) {
-         _LOG(LogFlags,"\n");
+   for(i = 0; i < NUM_BANKS; i++) {
+      for(j = 0; j < NUM_OPS_PER_BANK; j++) {
+         Opl3WriteReg(0,REG_ADR(i,0x40+OpOffset[j]),0x3f);   // KSL/TL (muted)
       }
-      else if(i != 0) {
-         _LOG(LogFlags," ");
-      }
-      _LOG(LogFlags,"%02x",cp[i]);
    }
-   if(((i - 1) & 0xf) != 0) {
-      _LOG(LogFlags,"\n");
+
+   for(i = 0; InitData[i].Bank != 0xff; i++) {
+      Opl3WriteReg(0,InitData[i].Reg + (InitData[i].Bank << 8) ,InitData[i].Value);
    }
 }
-#endif
 

@@ -89,6 +89,7 @@ void ListFiles(spiffs *pFS)
     spiffs_DIR dir;
     struct spiffs_dirent ent;
     struct spiffs_dirent *it;
+    uint32_t Total = 0;
 
     SPIFFS_opendir(pFS,0,&dir);
     for( ; ; ) {
@@ -96,9 +97,10 @@ void ListFiles(spiffs *pFS)
         if (!it) {
             break;
         }
-
+        Total += it->size;
         printf("%s: %ld\n",it->name,it->size);
     }
     SPIFFS_closedir(&dir);
+    printf("\nTotal %ld\n",Total);
 }
 

@@ -75,12 +75,6 @@ NET "led_green"             LOC = F13 | IOSTANDARD = LVCMOS33;
 NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33 | PULLUP;
 
 # Wolfson codec audio interface
-#NET "codec_bclk" LOC = AB13 | IOSTANDARD = LVCMOS33;
-#NET "codec_adclrc" LOC = W9 | IOSTANDARD = LVCMOS33;
-#NET "codec_adcdat" LOC = R13 | IOSTANDARD = LVCMOS33;
-#NET "codec_daclrc" LOC = U6 | IOSTANDARD = LVCMOS33;
-#NET "codec_dacdat" LOC = Y14 | IOSTANDARD = LVCMOS33;
-#NET "codec_mclk" LOC = W14 | IOSTANDARD = LVCMOS33;
 NET "codec_scl" LOC = U17 | IOSTANDARD = LVCMOS33;
 NET "codec_sda" LOC = AB17 | IOSTANDARD = LVCMOS33;
 

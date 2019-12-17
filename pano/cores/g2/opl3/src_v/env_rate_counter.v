@@ -48,7 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module env_rate_counter (
     input wire clk,
@@ -102,4 +102,4 @@ module env_rate_counter (
     
 endmodule
 
-	
+    

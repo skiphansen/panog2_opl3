@@ -60,6 +60,7 @@ module core_soc
     ,input           spi_miso_i
     ,input           uart_rx_i
     ,input  [ 31:0]  gpio_input_i
+    ,input           clk25_i
 
     // Outputs
     ,output          intr_o
@@ -77,98 +78,126 @@ module core_soc
     ,output          uart_tx_o
     ,output [ 31:0]  gpio_output_o
     ,output [ 31:0]  gpio_output_enable_o
+    ,output signed [15:0] channel_a
+    ,output signed [15:0] channel_b
+    ,output signed [15:0] channel_c
+    ,output signed [15:0] channel_d
+    ,output sample_clk
+    ,output sample_clk_128
 );
 
-wire  [ 31:0]  periph1_rdata_w;
-wire  [  1:0]  periph0_bresp_w;
-wire           periph2_awvalid_w;
-wire  [  1:0]  periph3_rresp_w;
-wire           periph4_arready_w;
-wire           periph1_bready_w;
-wire           periph2_arready_w;
-wire           periph3_arvalid_w;
-wire  [ 31:0]  periph4_rdata_w;
-wire           periph3_bready_w;
-wire           periph3_rvalid_w;
-wire           periph4_bvalid_w;
-wire           periph1_bvalid_w;
-wire           periph4_arvalid_w;
-wire           periph2_bready_w;
-wire           periph0_rvalid_w;
-wire           periph2_awready_w;
-wire           periph2_arvalid_w;
-wire           periph1_arvalid_w;
-wire  [ 31:0]  periph2_rdata_w;
-wire           periph0_awvalid_w;
-wire  [ 31:0]  periph3_araddr_w;
-wire  [  1:0]  periph1_rresp_w;
-wire  [ 31:0]  periph0_rdata_w;
-wire  [  3:0]  periph4_wstrb_w;
-wire  [ 31:0]  periph2_awaddr_w;
-wire  [  1:0]  periph4_bresp_w;
-wire           periph1_arready_w;
-wire  [ 31:0]  periph3_rdata_w;
-wire           periph4_rready_w;
-wire           periph1_wvalid_w;
-wire  [ 31:0]  periph4_araddr_w;
-wire           periph0_bvalid_w;
-wire           periph0_rready_w;
-wire           periph1_rready_w;
-wire           periph4_rvalid_w;
-wire           periph3_arready_w;
-wire  [  1:0]  periph2_bresp_w;
-wire           periph3_awvalid_w;
-wire           periph4_wready_w;
-wire  [ 31:0]  periph3_awaddr_w;
-wire  [  3:0]  periph1_wstrb_w;
-wire  [  1:0]  periph0_rresp_w;
-wire  [  3:0]  periph0_wstrb_w;
-wire  [ 31:0]  periph1_wdata_w;
-wire           periph1_awready_w;
-wire           interrupt1_w;
 wire           interrupt0_w;
-wire           interrupt3_w;
+wire           interrupt1_w;
 wire           interrupt2_w;
-wire  [ 31:0]  periph1_awaddr_w;
-wire           periph4_awvalid_w;
-wire           periph3_awready_w;
-wire           periph1_awvalid_w;
-wire           periph3_wready_w;
-wire           periph0_wready_w;
-wire  [ 31:0]  periph0_awaddr_w;
-wire  [  1:0]  periph3_bresp_w;
-wire           periph0_arvalid_w;
-wire           periph3_bvalid_w;
-wire           periph0_bready_w;
-wire  [ 31:0]  periph2_wdata_w;
-wire           periph4_wvalid_w;
-wire           periph0_wvalid_w;
-wire  [  3:0]  periph2_wstrb_w;
-wire           periph2_rvalid_w;
-wire  [ 31:0]  periph4_awaddr_w;
-wire  [  1:0]  periph4_rresp_w;
-wire  [  1:0]  periph1_bresp_w;
-wire           periph1_wready_w;
-wire           periph2_rready_w;
-wire           periph2_bvalid_w;
-wire           periph2_wready_w;
-wire  [ 31:0]  periph0_wdata_w;
-wire  [  3:0]  periph3_wstrb_w;
-wire  [ 31:0]  periph4_wdata_w;
-wire           periph0_awready_w;
-wire           periph1_rvalid_w;
-wire  [ 31:0]  periph1_araddr_w;
-wire           periph4_awready_w;
-wire           periph0_arready_w;
-wire  [ 31:0]  periph2_araddr_w;
-wire           periph3_wvalid_w;
-wire  [  1:0]  periph2_rresp_w;
+wire           interrupt3_w;
+
 wire  [ 31:0]  periph0_araddr_w;
-wire           periph4_bready_w;
-wire  [ 31:0]  periph3_wdata_w;
-wire           periph3_rready_w;
+wire           periph0_arready_w;
+wire           periph0_arvalid_w;
+wire  [ 31:0]  periph0_awaddr_w;
+wire           periph0_awready_w;
+wire           periph0_awvalid_w;
+wire           periph0_bready_w;
+wire  [  1:0]  periph0_bresp_w;
+wire           periph0_bvalid_w;
+wire  [ 31:0]  periph0_rdata_w;
+wire           periph0_rready_w;
+wire  [  1:0]  periph0_rresp_w;
+wire           periph0_rvalid_w;
+wire  [ 31:0]  periph0_wdata_w;
+wire           periph0_wready_w;
+wire  [  3:0]  periph0_wstrb_w;
+wire           periph0_wvalid_w;
+
+wire  [ 31:0]  periph1_araddr_w;
+wire           periph1_arready_w;
+wire           periph1_arvalid_w;
+wire  [ 31:0]  periph1_awaddr_w;
+wire           periph1_awready_w;
+wire           periph1_awvalid_w;
+wire           periph1_bready_w;
+wire  [  1:0]  periph1_bresp_w;
+wire           periph1_bvalid_w;
+wire  [ 31:0]  periph1_rdata_w;
+wire           periph1_rready_w;
+wire  [  1:0]  periph1_rresp_w;
+wire           periph1_rvalid_w;
+wire  [ 31:0]  periph1_wdata_w;
+wire           periph1_wready_w;
+wire  [  3:0]  periph1_wstrb_w;
+wire           periph1_wvalid_w;
+
+wire  [ 31:0]  periph2_araddr_w;
+wire           periph2_arready_w;
+wire           periph2_arvalid_w;
+wire  [ 31:0]  periph2_awaddr_w;
+wire           periph2_awready_w;
+wire           periph2_awvalid_w;
+wire           periph2_bready_w;
+wire  [  1:0]  periph2_bresp_w;
+wire           periph2_bvalid_w;
+wire  [ 31:0]  periph2_rdata_w;
+wire           periph2_rready_w;
+wire  [  1:0]  periph2_rresp_w;
+wire           periph2_rvalid_w;
+wire  [ 31:0]  periph2_wdata_w;
+wire           periph2_wready_w;
+wire  [  3:0]  periph2_wstrb_w;
 wire           periph2_wvalid_w;
 
+wire  [ 31:0]  periph3_araddr_w;
+wire           periph3_arready_w;
+wire           periph3_arvalid_w;
+wire  [ 31:0]  periph3_awaddr_w;
+wire           periph3_awready_w;
+wire           periph3_awvalid_w;
+wire           periph3_bready_w;
+wire  [  1:0]  periph3_bresp_w;
+wire           periph3_bvalid_w;
+wire  [ 31:0]  periph3_rdata_w;
+wire           periph3_rready_w;
+wire  [  1:0]  periph3_rresp_w;
+wire           periph3_rvalid_w;
+wire  [ 31:0]  periph3_wdata_w;
+wire           periph3_wready_w;
+wire  [  3:0]  periph3_wstrb_w;
+wire           periph3_wvalid_w;
+
+wire  [ 31:0]  periph4_araddr_w;
+wire           periph4_arready_w;
+wire           periph4_arvalid_w;
+wire  [ 31:0]  periph4_awaddr_w;
+wire           periph4_awready_w;
+wire           periph4_awvalid_w;
+wire           periph4_bready_w;
+wire  [  1:0]  periph4_bresp_w;
+wire           periph4_bvalid_w;
+wire  [ 31:0]  periph4_rdata_w;
+wire           periph4_rready_w;
+wire  [  1:0]  periph4_rresp_w;
+wire           periph4_rvalid_w;
+wire  [ 31:0]  periph4_wdata_w;
+wire           periph4_wready_w;
+wire  [  3:0]  periph4_wstrb_w;
+wire           periph4_wvalid_w;
+
+wire  [ 31:0]  periph5_araddr_w;
+wire           periph5_arready_w;
+wire           periph5_arvalid_w;
+wire  [ 31:0]  periph5_awaddr_w;
+wire           periph5_awready_w;
+wire           periph5_awvalid_w;
+wire           periph5_bready_w;
+wire  [  1:0]  periph5_bresp_w;
+wire           periph5_bvalid_w;
+wire  [ 31:0]  periph5_rdata_w;
+wire           periph5_rready_w;
+wire  [  1:0]  periph5_rresp_w;
+wire           periph5_rvalid_w;
+wire  [ 31:0]  periph5_wdata_w;
+wire           periph5_wready_w;
+wire  [  3:0]  periph5_wstrb_w;
+wire           periph5_wvalid_w;
 
 irq_ctrl
 u_intc
@@ -258,6 +287,15 @@ u_dist
     ,.outport4_rvalid_i(periph4_rvalid_w)
     ,.outport4_rdata_i(periph4_rdata_w)
     ,.outport4_rresp_i(periph4_rresp_w)
+    ,.outport5_awready_i(periph5_awready_w)
+    ,.outport5_wready_i(periph5_wready_w)
+    ,.outport5_bvalid_i(periph5_bvalid_w)
+    ,.outport5_bresp_i(periph5_bresp_w)
+    ,.outport5_arready_i(periph5_arready_w)
+    ,.outport5_rvalid_i(periph5_rvalid_w)
+    ,.outport5_rdata_i(periph5_rdata_w)
+    ,.outport5_rresp_i(periph5_rresp_w)
+
 
     // Outputs
     ,.inport_awready_o(inport_awready_o)
@@ -313,6 +351,15 @@ u_dist
     ,.outport4_arvalid_o(periph4_arvalid_w)
     ,.outport4_araddr_o(periph4_araddr_w)
     ,.outport4_rready_o(periph4_rready_w)
+    ,.outport5_awvalid_o(periph5_awvalid_w)
+    ,.outport5_awaddr_o(periph5_awaddr_w)
+    ,.outport5_wvalid_o(periph5_wvalid_w)
+    ,.outport5_wdata_o(periph5_wdata_w)
+    ,.outport5_wstrb_o(periph5_wstrb_w)
+    ,.outport5_bready_o(periph5_bready_w)
+    ,.outport5_arvalid_o(periph5_arvalid_w)
+    ,.outport5_araddr_o(periph5_araddr_w)
+    ,.outport5_rready_o(periph5_rready_w)
 );
 
 
@@ -447,23 +494,36 @@ u_gpio
     ,.intr_o(interrupt3_w)
 );
 
-`ifdef NOTYET
-opl3 u_opl3 (
-// Inputs
-  .clk,       // cpu clock
-  ,clk_opl3()  // 25 MHz OPL2 clock
-  ,opl3_we()   // register write
-  ,opl3_data() // register data
-  ,opl3_adr()  // register address
+opl3_axi4lite u_opl3 (
+      // Inputs
+    .clk_i(clk_i)
+    ,.rst_i(rst_i)
+    ,.cfg_awvalid_i(periph5_awvalid_w)
+    ,.cfg_awaddr_i(periph5_awaddr_w)
+    ,.cfg_wvalid_i(periph5_wvalid_w)
+    ,.cfg_wdata_i(periph5_wdata_w)
+    ,.cfg_wstrb_i(periph5_wstrb_w)
+    ,.cfg_bready_i(periph5_bready_w)
+    ,.cfg_arvalid_i(periph5_arvalid_w)
+    ,.cfg_araddr_i(periph5_araddr_w)
+    ,.cfg_rready_i(periph5_rready_w)
+    ,.clk_opl3(clk25_i)   // 25 MHz OPL2 clock
 
-// Outputs
-  ,channel_a()
-  ,channel_b()
-  ,channel_c()
-  ,channel_d(
-  ,sample_clk()
-  ,sample_clk_128()   // 128 X sample rate clock
-);
-`endif
+    // Outputs
+    ,.cfg_awready_o(periph5_awready_w)
+    ,.cfg_wready_o(periph5_wready_w)
+    ,.cfg_bvalid_o(periph5_bvalid_w)
+    ,.cfg_bresp_o(periph5_bresp_w)
+    ,.cfg_arready_o(periph5_arready_w)
+    ,.cfg_rvalid_o(periph5_rvalid_w)
+    ,.cfg_rdata_o(periph5_rdata_w)
+    ,.cfg_rresp_o(periph5_rresp_w)
+    ,.channel_a(channel_a)
+    ,.channel_b(channel_b)
+    ,.channel_c(channel_c)
+    ,.channel_d(channel_d)
+    ,.sample_clk(sample_clk)
+    ,.sample_clk_128(sample_clk_128)
+  );
 
 endmodule

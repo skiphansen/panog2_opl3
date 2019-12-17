@@ -49,7 +49,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module vibrato (
     input wire clk,

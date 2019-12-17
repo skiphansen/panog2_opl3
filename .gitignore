@@ -1,3 +1,10 @@
 *.pyc
 *.log
+*.vcd
+*.a
 build/
+lib/
+obj/
+obj_verilated/
+verilated/
+

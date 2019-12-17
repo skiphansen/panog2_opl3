@@ -9,5 +9,7 @@
 #define GPIO_BIT_BLUE_LED     0x10
 #define GPIO_BIT_CODEC_SDA    0x20
 #define GPIO_BIT_CODEC_SCL    0x40
+
+#define OPL3_BASE             0x95000000
 #endif   // _PANIO_IO_H_
 

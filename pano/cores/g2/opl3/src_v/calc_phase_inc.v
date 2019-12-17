@@ -49,7 +49,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module calc_phase_inc (
     input wire clk,
@@ -92,13 +92,10 @@ module calc_phase_inc (
     end
 
     always @(posedge clk)
-        if (reset)
-            post_mult <= 0;
-        else
-            case (mult)
-            'h0: post_mult <= pre_mult >> 1;
-            default: post_mult <= pre_mult * pre_mult_adj;
-            endcase
+        case (mult)
+        'h0: post_mult <= pre_mult >> 1;
+        default: post_mult <= pre_mult * pre_mult_adj;
+        endcase
     
     always @ *
         if (vib)

@@ -50,7 +50,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module calc_rhythm_phase (
     input wire clk,
@@ -62,7 +62,7 @@ module calc_rhythm_phase (
     input wire [`PHASE_ACC_WIDTH-1:0] phase_acc_13,
     input wire [2:0] op_type,    
     output reg [`PHASE_ACC_WIDTH-1:0] rhythm_phase
-);	
+);  
     localparam RAND_POLYNOMIAL = 'h800302; // verified on real opl3
     localparam RAND_NUM_WIDTH = 24;
     
@@ -120,4 +120,4 @@ module calc_rhythm_phase (
                 rand_num <= rand_num >> 1;  
 endmodule
 
-	
+    

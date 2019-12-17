@@ -48,7 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module tremolo (
     input wire clk,
@@ -86,4 +86,4 @@ module tremolo (
             am_val <= am_val_tmp1 >> 2;
 endmodule
 
-	
+    

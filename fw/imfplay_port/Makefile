@@ -8,11 +8,16 @@ EXTRA_CFLAGS+= -DCPU_KHZ=50000
 EXTRA_CFLAGS += -DCONFIG_UARTLITE
 EXTRA_CFLAGS += -DCONFIG_UARTLITE_BASE=0x92000000
 
+# SPI driver
+EXTRA_CFLAGS += -DCONFIG_SPILITE
+EXTRA_CFLAGS += -DCONFIG_SPILITE_BASE=0x93000000
 
 TOPDIR	     = ../../../..
 SRC_DIR      = ./ 
 SRC_DIR     += $(TOPDIR)/soc/core_soc/src_c
 SRC_DIR     += $(TOPDIR)/src_c/drivers
+SRC_DIR     += ../spiffs
+EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
 
 BASE_ADDRESS  = 0x0
 OPT           = 2

@@ -48,7 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module envelope_generator #(
     parameter SILENCE = 511
@@ -193,4 +193,4 @@ module envelope_generator #(
     
 endmodule
 
-	
+    

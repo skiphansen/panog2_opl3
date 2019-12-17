@@ -49,6 +49,7 @@ module fpga_top
 (
     // Inputs
      input           clk_i
+    ,input           clk25_i
     ,input           rst_i
     ,input           dbg_txd_i
     ,input           spi_miso_i
@@ -63,6 +64,12 @@ module fpga_top
     ,output          uart_tx_o
     ,output [ 31:0]  gpio_output_o
     ,output [ 31:0]  gpio_output_enable_o
+    ,output signed [15:0] channel_a
+    ,output signed [15:0] channel_b
+    ,output signed [15:0] channel_c
+    ,output signed [15:0] channel_d
+    ,output sample_clk
+    ,output sample_clk_128
 );
 
 wire  [  3:0]  axi_t_awid_w;
@@ -331,6 +338,7 @@ u_soc
     ,.spi_miso_i(spi_miso_i)
     ,.uart_rx_i(uart_rx_i)
     ,.gpio_input_i(gpio_input_i)
+    ,.clk25_i(clk25_i)
 
     // Outputs
     ,.intr_o(soc_intr_w)
@@ -348,6 +356,12 @@ u_soc
     ,.uart_tx_o(uart_tx_o)
     ,.gpio_output_o(gpio_output_o)
     ,.gpio_output_enable_o(gpio_output_enable_o)
+    ,.channel_a(channel_a)
+    ,.channel_b(channel_b)
+    ,.channel_c(channel_c)
+    ,.channel_d(channel_d)
+    ,.sample_clk(sample_clk)
+    ,.sample_clk_128(sample_clk_128)
 );
 
 

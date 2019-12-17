@@ -17,7 +17,7 @@ SRC_DIR      += $(CORES_DIR)/core_soc/src_v
 SRC_DIR      += $(CORES_DIR)/dbg_bridge/src_v
 SRC_DIR      += $(CORES_DIR)/cpu/riscv/core/$(RISCV_CORE)
 SRC_DIR      += $(CORES_DIR)/cpu/riscv/top_tcm_wrapper
-#SRC_DIR      += $(PANO_CORES_DIR)/g2/opl3/src_v
+SRC_DIR      += $(PANO_CORES_DIR)/g2/opl3/src_v
 
 EXTRA_VFLAGS += CPU_SELECT_RISCV=1
 
@@ -28,14 +28,23 @@ EXCLUDE_SRC += $(CORES_DIR)/core_soc/src_v/core_soc.v
 BSCAN_SPI_DIR = $(PANO_CORES_DIR)/xc3sprog
 
 COMPRESS_BITFILE = yes
+#MAP_CMDS = -w -intstyle ise -detail -ir off -ignore_keep_hierarchy -ol high
+
+# NB: the -pr b option was removed from the default options, otherwise there 
+# are timing errors
+MAP_CMDS = -w -intstyle ise -detail -ir off -ignore_keep_hierarchy -timing -ol high -mt 2
+
+# use 4 cores
+PAR_CMDS = -w -intstyle ise -ol high  -mt 4
+
 
 .PHONY: init_and_build
 
 TOPDIR = ..
+include $(TOPDIR)/pano/make/ise.mk
+
 prog_fs:
 	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/dro_test_spiffs.img:W:9043968:bin
-
-include $(TOPDIR)/pano/make/ise.mk
 
 #${CORES_README}:
 #	git submodule init
