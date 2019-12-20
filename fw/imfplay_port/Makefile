@@ -17,58 +17,21 @@ SRC_DIR      = .
 SRC_DIR     += $(CORES_DIR)/core_soc/src_c
 SRC_DIR     += $(PANO_FW_DIR)/lib/libstd
 SRC_DIR     += $(PANO_CORES_DIR)/g2/opl3/src_c
-# SRC_DIR     += $(TOPDIR)/src_c/drivers
+SRC_DIR     += $(TOPDIR)/src_c/drivers
 EXTRA_SRC   += $(PANO_FW_DIR)/common/i2c.c
 EXTRA_SRC   += $(PANO_FW_DIR)/common/audio.c
 EXTRA_SRC   += $(PANO_FW_DIR)/common/log.c
-#SRC_DIR     += ../spiffs
-#EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
+SRC_DIR     += ../spiffs
+EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
 
 INCLUDE_PATH += ../include
 INCLUDE_PATH += $(PANO_FW_DIR)/common
 
 BASE_ADDRESS  = 0x0
 OPT           = 2
-
-TARGET_PORT ?= /dev/ttyUSB1
-RUN_PREFIX  := $(TOPDIR)/run.py -d $(TARGET_PORT) -b 1000000 -f 
-
-# Test file
-#DRO_FILE = opl3dro/doom_000.dro
-#DRO_FILE = opl3dro/doom_035.dro
-#DRO_FILE = opl3dro/doom_036.dro
-
-DRO_FILE = opl3dro/doom2_000.dro
-#DRO_FILE = opl3dro/doom2_001.dro
-#DRO_FILE = opl3dro/doom2_002.dro
-#DRO_FILE = opl3dro/doom2_003.dro
-#DRO_FILE = opl3dro/doom2_013.dro
-#DRO_FILE = opl3dro/doom2_014.dro
-#DRO_FILE = opl3dro/doom2_015.dro
-#DRO_FILE = opl3dro/doom2_016.dro
-#DRO_FILE = opl3dro/doom2_031.dro
-#DRO_FILE = opl3dro/doom2_032.dro
-#DRO_FILE = opl3dro/xcom_001.dro
-
-# these don't work (opl3 support needed?)
-
-#OPL3 files
-#DRO_FILE = opl3dro/war_000.dro #(doesn't fit in flash, plays if truncated manually
-#DRO_FILE = opl3dro/atlantis_000.dro #(doesn't fit in flash)
-#DRO_FILE = opl3dro/dott_000.dro
-
-# opl2 file?
-
-CLEAN_FILES += mfs_file.h
+ENABLE_LST = yes
 
 include $(TOPDIR)/pano/make/c_prog.mk
-
-BIN2C := $(TOPDIR)/tools/bin2c/bin2c
-
-mfs_file.h: $(BIN2C) Makefile
-	$(BIN2C) $(DRO_FILE) mfs_file.h gMfsFile
-
-
 
 
 

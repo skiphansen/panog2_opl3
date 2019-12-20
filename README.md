@@ -1,4 +1,4 @@
-# Yamaha OPL2 for the Panologic thin client
+# Yamaha OPL3 for the second generation Panologic thin client
 
 This is a port of Saanlima Electronics's port of Greg Taylor's clone of the
 OPL3 Yamaha YMF262 FM synthesis sound chip in System Verilog.  
@@ -11,13 +11,7 @@ legacy Verilog because Xilinx's ISE doesn't support System Verilog. This is
 important for designs based on the Spartan 3 or Spartan 6 FPGAs such as the 
 Panologic devices.
 
-Magnus's was interested in running Doom on an Spartan 6 LX9 and he found that
-the full OPL3 didn't fit so he also also created a OPL2 subset which all that
-is used by Doom anyway.
-
-I made further modifications to the core OPL code to correct errors encountered 
-when using the Spartan 3 version of ISE.  I also and created an interface to 
-the Pano's Wolfson codec.
+I created an interface to the Pano's Wolfson codec.
 
 I had initially given up on the Pano G1 after the first cut didn't fit 
 because it ran out of multiplers. When I mentioned this to Tom Verbeure he 
@@ -29,23 +23,21 @@ The eventual plan is to use this core on other projects to do more interesting
 things.
 
 ## Status
-The project builds and the Doom test files play.  It is suspected that the 
-files that don't play are targeting an opl3 rather than an opl2.
+The project builds and the all of the test files from the orginal project play.  
 
-A prebuilt demo bit and firmware file is committed (./xilinx/panog1_opl3.msc) 
-which plays an .DRO file that has been compiled into the firmware.
 
 ## HW Requirements
 
 * A Pano Logic G2 (the one with a DVI port)
 * A suitable 5 volt power supply
 * A JTAG programmer to load the bitstream into the FPGA.
+* A serial port compatible with 5 volt logic levels.
+* A custom able to connect the serial port to the Pano.
 
-
-## Building and Installation
+## Serial cable
 Please see fpga_test_soc for the [pano](https://github.com/skiphansen/fpga_test_soc/blob/master/fpga/panologic_g2/README.md) for 
-more information and detailed information on how to build and flash this 
-project into a device.
+more information on the needed cable.
+
 
 ## Acknowledgement and Thanks
 This project uses code from several other projects including:

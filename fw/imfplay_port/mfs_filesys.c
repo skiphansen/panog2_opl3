@@ -6,15 +6,17 @@
 */ 
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
+
+#include "spiffs.h"
+
 #include "xilmfs.h"
-// #define DEBUG_LOGGING
+#define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 // #define LOG_TO_BOTH
 #include "log.h"
 
-#include "mfs_file.h"
-
-static long gCurrentOffset;
+extern spiffs *gSpiffs;
 
 /**
  * open a file
@@ -28,9 +30,12 @@ static long gCurrentOffset;
  */
 int mfs_file_open(const char *filename, int mode) 
 {
-   VLOG("Called\n");
-   gCurrentOffset = 0;
-   return 0;
+   int Ret;
+   LOG("Opening '%s'\n",filename);
+   Ret = (int) SPIFFS_open(gSpiffs,filename,SPIFFS_O_RDONLY, 0);
+   LOG("SPIFFS_open returned %d\n",Ret);
+
+   return Ret;
 }
 
 /**
@@ -47,16 +52,15 @@ int mfs_file_open(const char *filename, int mode)
 */
 int mfs_file_read(int fd, char *buf, int buflen) 
 {
-   int ReadLen = buflen;
-   if(gCurrentOffset +  ReadLen > sizeof(gMfsFile)) {
-      ReadLen = sizeof(gMfsFile) - gCurrentOffset;
+   int Ret; 
+   VLOG("Reading %d bytes into buffer @ %p\n",buflen,buf);
+   Ret = (int) SPIFFS_read(gSpiffs,(s16_t) fd,buf,buflen);
+   VLOG("Returning %d\n",Ret);
+   if(Ret > 0) {
+      VLOG_HEX(buf,Ret);
    }
-   memcpy(buf,&gMfsFile[gCurrentOffset],ReadLen);
 
-   VLOG("Read %d bytes from offset %d\n",ReadLen,gCurrentOffset);
-   gCurrentOffset += ReadLen;
-
-   return ReadLen;
+   return Ret;
 }
 
 /**
@@ -70,8 +74,11 @@ int mfs_file_read(int fd, char *buf, int buflen)
  */
 int mfs_file_close(int fd) 
 {
-   VLOG("Called\n");
-   return 0;
+   int Ret;
+   LOG("Called, fd %d\n",fd);
+   Ret = (int) SPIFFS_close(gSpiffs,(s16_t) fd);
+
+   return Ret;
 }
 
 /**
@@ -86,33 +93,11 @@ int mfs_file_close(int fd)
  */
 long mfs_file_lseek(int fd, long offset, int whence) 
 {
-   long Ret = gCurrentOffset;
-   const char *Whence = "Invalid";
-
-   switch(whence) {
-      case MFS_SEEK_SET:
-         Ret = offset;
-         Whence = "MFS_SEEK_SET";
-         break;
-
-      case MFS_SEEK_CUR:
-         Ret += offset;
-         Whence = "MFS_SEEK_CUR";
-         break;
-
-      case MFS_SEEK_END:
-         Ret = sizeof(gMfsFile) + offset;
-         Whence = "MFS_SEEK_END";
-         break;
-   }
-   VLOG("%s, offset %d\n",offset);
-
-   if(Ret < 0 || Ret > sizeof(gMfsFile)) {
-      Ret = -1;
-   }
-   else {
-      gCurrentOffset = Ret;
-   }
+   long Ret;
+   VLOG("Called fd %d, offset %ld, whence %d\n",fd,offset,whence);
+   
+   Ret = SPIFFS_lseek(gSpiffs,fd,offset,whence);
+   VLOG("Returning %ld\n",Ret);
 
    return Ret;
 }

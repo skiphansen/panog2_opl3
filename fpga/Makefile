@@ -6,12 +6,6 @@ CPU        ?= riscv
 # Choice: [rv32i, rv32i_spartan6, rv32im, rv32imsu]
 RISCV_CORE  ?= rv32i_spartan6
 
-# Choice: g1, g2
-PANO_SERIES ?= g2
-
-# Set to yes for second generation, rev C (lx100 FPGA)
-PANO_REV_C  ?= no
-
 SRC_DIR       = .
 SRC_DIR      += $(CORES_DIR)/core_soc/src_v
 SRC_DIR      += $(CORES_DIR)/dbg_bridge/src_v

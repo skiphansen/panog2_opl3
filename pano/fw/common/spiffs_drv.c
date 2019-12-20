@@ -3,7 +3,7 @@
 #include "spiffs.h"
 #include "spi_lite.h"
 
-#define DEBUG_LOGGING
+// #define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 #include "log.h"
 
@@ -17,7 +17,7 @@ static s32_t api_spiffs_read(u32_t addr, u32_t size, u8_t *Buf)
 {
    u32_t TempAdr = addr;
 
-   VLOG("Called, adr 0x%x size %ld\n",addr,size);
+   VLOG("Called, adr 0x%x size %ld, buf %p\n",addr,size,Buf);
    spi_cs(0);
    spi_sendrecv(0x03);
    spi_sendrecv((uint8_t) ((TempAdr >> 16) & 0xff));

@@ -21,6 +21,6 @@ XC3SPROG      ?= xc3sprog
 # run tool related
 TARGET_BAUD ?= 1000000
 TARGET_PORT ?= /dev/ttyUSB1
-RUN_PREFIX  := $(TOOLS_DIR)/run/run.py -d $(TARGET_PORT) -b $(TARGET_BAUD) -f 
+RUN_PREFIX  := $(TOOLS_DIR)/dbg_bridge/run.py -d $(TARGET_PORT) -b $(TARGET_BAUD) -f 
 
 

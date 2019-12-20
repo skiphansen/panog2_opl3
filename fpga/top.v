@@ -165,7 +165,7 @@ assign spi_so_w    = flash_so_i;
 
 //-----------------------------------------------------------------
 // GPIO bits
-// 0: reserved for CPU reset (?)
+// 0: Not implmented
 // 1: Pano button
 // 2: Output only - red LED
 // 3: In/out - green LED

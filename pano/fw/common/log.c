@@ -4,7 +4,7 @@
 #include "log.h"
 
 #ifndef LOGGING_DISABLED
-void LogHex(char *LogFlags,void *Data,int Len)
+void LogHex(int LogFlags,void *Data,int Len)
 {
    int i;
    uint8_t *cp = (uint8_t *) Data;

@@ -53,7 +53,7 @@ subject to the following restrictions:
 #define XPAR_PS7_UART_1_BASEADDR          0
 void Opl3WriteReg(uint8_t chip,uint16_t RegOffset,uint8_t Data);
 
-// #define DEBUG_LOGGING
+#define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 // #define LOG_TO_BOTH
 #include "log.h"
@@ -360,29 +360,32 @@ int imfplay(char *filename)
 {
    fileinfo f;
 
-   VLOG("called\n");
+   LOG("Playing %s\n",filename);
 
    // unmute output
    VLOG("calling opl2_out(2, 1, 1)\n");
    opl2_out(2, 1, 1);
 
-   file_open(&f, filename);
+   if (!file_open(&f, filename)) {
+      LOG("file_open failed\n");
+      return EXIT_FAILURE;
+   }
+
+#if 0
+   if (argc > 2)
+      freq_div = atoi(argv[2]);
+#endif
+
+   if (!(freq_div > 0 && freq_div < 32768)) {
+      if (f.type == FT_IMF0 || f.type == FT_IMF1)
+         freq_div = 560;      //default for IMFs
+      else
+         freq_div = 1000;  //default for DRO
+   }
 
    //open IMF
 /* if (argc > 1)
    {
-      if (!file_open(&f, argv[1]))
-         return EXIT_FAILURE;
-
-      if (argc > 2)
-         freq_div = atoi(argv[2]);
-
-      if (!(freq_div > 0 && freq_div < 32768)) {
-         if (f.type == FT_IMF0 || f.type == FT_IMF1)
-            freq_div = 560;      //default for IMFs
-         else
-            freq_div = 1000;  //default for DRO
-      }
    }
    else
    {
@@ -413,6 +416,11 @@ int imfplay(char *filename)
       case FT_DRO2:
          LOG("DRO 2.0 file\n");
          break;
+
+      default:
+         LOG("Error: unknown type 0x%x\n",f.type);
+         break;
+
    }
 
    //clear OPL2

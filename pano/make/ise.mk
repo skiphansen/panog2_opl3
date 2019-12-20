@@ -43,7 +43,7 @@ SRC_FILES := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $
 ###############################################################################
 # Rules:
 ###############################################################################
-all: bitstream $(PREBUILT_DIR)/$(PROJECT).bit
+all: bitstream $(PREBUILT_DIR)/$(PART_NAME).bit
 
 BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
 
@@ -136,8 +136,8 @@ $(BIT_FILE): $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/bitgen -f $(PROJECT).ut $(PROJECT)_routed.ncd
 
-$(PREBUILT_DIR)/$(PROJECT).bit: $(BIT_FILE)
-	@cp $(BIT_FILE) $(PREBUILT_DIR)/$(PROJECT).bit
+$(PREBUILT_DIR)/$(PART_NAME).bit: $(BIT_FILE)
+	@cp $(BIT_FILE) $(PREBUILT_DIR)/$(PART_NAME).bit
 
 ###############################################################################
 # Rule: Bitstream -> binary
@@ -152,13 +152,13 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 # Rule: Load Bitstream using XC2PROG
 ###############################################################################
 load:
-	$(XC3SPROG) $(XC3SPROG_OPTS) $(PREBUILT_DIR)/$(PROJECT).bit
+	$(XC3SPROG) $(XC3SPROG_OPTS) $(PREBUILT_DIR)/$(PART_NAME).bit
 
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG
 ###############################################################################
 BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit   
 prog_fpga: $(PREBUILT_DIR)/$(PROJECT).bit
-	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/$(PROJECT).bit
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/$(PART_NAME).bit
 
 
