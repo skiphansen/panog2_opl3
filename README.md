@@ -1,217 +1,61 @@
-### FPGA Test SoC
+# Yamaha OPL2 for the Panologic thin client
 
-Github:   [https://github.com/ultraembedded/fpga_test_soc](https://github.com/ultraembedded/fpga_test_soc)
+This is a port of Saanlima Electronics's port of Greg Taylor's clone of the
+OPL3 Yamaha YMF262 FM synthesis sound chip in System Verilog.  
 
-A small test SoC for various soft-CPUs (Cortex-M0, RISC-V).
+If you don't know what a Panologic thin client is please see [here](https://hackaday.com/2013/01/11/ask-hackaday-we-might-have-some-fpgas-to-hack/) 
+and [here](https://github.com/skiphansen/pano_hello_g1) for background.
 
-![](doc/block_diagram.png)
+Magnus of Saanlima Electronics translated Greg Taylor's System Verilog HDL to 
+legacy Verilog because Xilinx's ISE doesn't support System Verilog. This is
+important for designs based on the Spartan 3 or Spartan 6 FPGAs such as the 
+Panologic devices.
 
-## Cloning
+Magnus's was interested in running Doom on an Spartan 6 LX9 and he found that
+the full OPL3 didn't fit so he also also created a OPL2 subset which all that
+is used by Doom anyway.
 
-This repo contains submodules.  
-Make sure to clone them with the following command;
+I made further modifications to the core OPL code to correct errors encountered 
+when using the Spartan 3 version of ISE.  I also and created an interface to 
+the Pano's Wolfson codec.
 
-```
-git clone --recursive https://github.com/ultraembedded/fpga_test_soc.git
+I had initially given up on the Pano G1 after the first cut didn't fit 
+because it ran out of multiplers. When I mentioned this to Tom Verbeure he 
+spent a few minutes studying the HDL then made a few tweaks and eliminated a 
+bunch of multipliers.  It now fits by a good margin (28% utilization including
+a RISC-V core, VGA and other glue logic).
 
-```
+The eventual plan is to use this core on other projects to do more interesting
+things.
 
-## Features
-* Support for RISC-V or ARM Cortex-M0 CPU
-* Load SW via UART/USB serial.
-* Multi-channel timer peripheral.
-* UART peripheral.
-* SPI (master mode) peripheral with 8 chip selects.
-* 32 I/O GPIO controller.
-* Interrupt controller (combines peripheral IRQs into single IRQ).
+## Status
+The project builds and the Doom test files play.  It is suspected that the 
+files that don't play are targeting an opl3 rather than an opl2.
 
-## Memory Map
+A prebuilt demo bit and firmware file is committed (./xilinx/panog1_opl3.msc) 
+which plays an .DRO file that has been compiled into the firmware.
 
-| Range                     | Description                                         |
-| ------------------------- | --------------------------------------------------- |
-| 0x0000_0000 - 0x0000_ffff | 64-KB Memory (RISC-V)                               |
-| 0x0000_0000 - 0x0000_7fff | 32-KB Instruction Memory (Cortex-M0)                |
-| 0x2000_0000 - 0x2000_7fff | 32-KB Data Memory (Cortex-M0)                       |
-| 0x9000_0000 - 0x90ff_ffff | Peripheral - IRQ controller                         |
-| 0x9100_0000 - 0x91ff_ffff | Peripheral - Timer                                  |
-| 0x9200_0000 - 0x92ff_ffff | Peripheral - UART                                   |
-| 0x9300_0000 - 0x93ff_ffff | Peripheral - SPI                                    |
-| 0x9400_0000 - 0x94ff_ffff | Peripheral - GPIO                                   |
+## HW Requirements
 
-## Project Files
+* A Pano Logic G2 (the one with a DVI port)
+* A suitable 5 volt power supply
+* A JTAG programmer to load the bitstream into the FPGA.
 
-This project is constructed from various sub-projects;
-* [CPU - RISC-V](https://github.com/ultraembedded/riscv)
-* [CPU - Cortex-M0 Wrapper](https://github.com/ultraembedded/cortex_m0_wrapper)
-* [Peripherals](https://github.com/ultraembedded/core_soc)
-* [UART -> AXI Debug Bridge](https://github.com/ultraembedded/core_dbg_bridge)
 
-```
-├── cpu
-│   ├── cortex_m0
-│   │   └── src_v
-│   │       ├── ahb_dport.v
-│   │       ├── cortexm0ds_logic.v       [NOT SUPPLIED]
-│   │       ├── CORTEXM0INTEGRATION.v    [NOT SUPPLIED]
-│   │       ├── cortex_m0.v
-│   │       ├── cortex_m0_wrapper.v
-│   │       ├── dport_axi.v
-│   │       ├── dport_mem_pmem.v
-│   │       ├── dport_mem_ram13.v
-│   │       ├── dport_mem.v
-│   │       └── dport_mux.v
-│   └── riscv
-│       ├── core
-│       │   ├── rv32i
-│       │   │   ├── riscv_alu.v
-│       │   │   ├── riscv_core.v
-│       │   │   ├── riscv_csr.v
-│       │   │   ├── riscv_decode.v
-│       │   │   ├── riscv_defs.v
-│       │   │   ├── riscv_exec.v
-│       │   │   ├── riscv_fetch.v
-│       │   │   ├── riscv_lsu.v
-│       │   │   └── riscv_regfile.v
-│       │   ├── rv32im
-│       │   │   ├── riscv_alu.v
-│       │   │   ├── riscv_core.v
-│       │   │   ├── riscv_csr.v
-│       │   │   ├── riscv_decode.v
-│       │   │   ├── riscv_defs.v
-│       │   │   ├── riscv_exec.v
-│       │   │   ├── riscv_fetch.v
-│       │   │   ├── riscv_lsu.v
-│       │   │   ├── riscv_muldiv.v
-│       │   │   └── riscv_regfile.v
-│       │   ├── rv32imsu
-│       │   │   ├── riscv_alu.v
-│       │   │   ├── riscv_core.v
-│       │   │   ├── riscv_csr.v
-│       │   │   ├── riscv_decode.v
-│       │   │   ├── riscv_defs.v
-│       │   │   ├── riscv_exec.v
-│       │   │   ├── riscv_fetch.v
-│       │   │   ├── riscv_lsu.v
-│       │   │   ├── riscv_mmu_arb.v
-│       │   │   ├── riscv_mmu.v
-│       │   │   ├── riscv_muldiv.v
-│       │   │   └── riscv_regfile.v
-│       │   └── rv32i_spartan6
-│       │       ├── riscv_alu.v
-│       │       ├── riscv_core.v
-│       │       ├── riscv_csr.v
-│       │       ├── riscv_decode.v
-│       │       ├── riscv_defs.v
-│       │       ├── riscv_exec.v
-│       │       ├── riscv_fetch.v
-│       │       ├── riscv_lsu.v
-│       │       └── riscv_regfile.v
-│       └── top_tcm_wrapper
-│           ├── dport_axi.v
-│           ├── dport_mux.v
-│           ├── riscv_tcm_wrapper.v
-│           ├── tcm_mem_pmem.v
-│           ├── tcm_mem_ram.v
-│           └── tcm_mem.v
-├── fpga
-│   ├── arty_a7
-│   │   ├── artix7_pll.v
-│   │   ├── arty_revb.xdc
-│   │   ├── makefile
-│   │   └── top.v
-│   ├── common
-│   │   ├── axi4_axi4lite_conv.v
-│   │   ├── fpga_top.v
-│   │   ├── makefile.fpga_ise
-│   │   ├── makefile.fpga_vivado
-│   │   └── reset_gen.v
-│   ├── minispartan6
-│   │   ├── fpga.ucf
-│   │   ├── makefile
-│   │   └── top.v
-│   └── qmtech_a7
-│       ├── makefile
-│       ├── top.v
-│       └── xc7m.xdc
-└── soc
-    ├── core_soc
-    │   └── src_v
-    │       ├── axi4lite_dist.v
-    │       ├── core_soc.v
-    │       ├── gpio_defs.v
-    │       ├── gpio.v
-    │       ├── irq_ctrl_defs.v
-    │       ├── irq_ctrl.v
-    │       ├── spi_lite_defs.v
-    │       ├── spi_lite.v
-    │       ├── timer_defs.v
-    │       ├── timer.v
-    │       ├── uart_lite_defs.v
-    │       └── uart_lite.v
-    └── dbg_bridge
-        └── src_v
-            ├── dbg_bridge_fifo.v
-            ├── dbg_bridge_uart.v
-            └── dbg_bridge.v
-```
+## Building and Installation
+Please see fpga_test_soc for the [pano](https://github.com/skiphansen/fpga_test_soc/blob/master/fpga/panologic_g2/README.md) for 
+more information and detailed information on how to build and flash this 
+project into a device.
 
-## Getting Started
+## Acknowledgement and Thanks
+This project uses code from several other projects including:
+ - [https://github.com/gtaylormb/opl3_fpga]
+ - [https://github.com/Saanlima/Pipistrello]
+ - [https://github.com/pellepl/spiffs.git]
+ - [https://github.com/ultraembedded/fpga_test_soc.git]
 
-#### Building a FPGA target (RISC-V)
+## LEGAL 
 
-```
-# Choose target board
-cd fpga/arty_a7
+My original work (the Pano Codec glue code) is released under the GNU General 
+Public License, version 2.
 
-# Make sure Vivado environmental variables setup
-source /opt/Xilinx/Vivado/XXXX.X/settings64.sh
-
-# Build bitstream
-make CPU=riscv
-
-# Load bitstream onto target board
-make run
-```
-
-#### Building a FPGA target (Cortex-M0)
-
-```
-
-# Download ARM Cortex-M0 DesignStart from ARM
-
-# Copy CPU core files into this project
-cp CORTEXM0INTEGRATION.v cpu/cortex_m0/src_v/
-cp cortexm0ds_logic.v cpu/cortex_m0/src_v/
-
-# Choose target board
-cd fpga/arty_a7
-
-# Make sure Vivado environmental variables setup
-source /opt/Xilinx/Vivado/XXXX.X/settings64.sh
-
-# Build bitstream
-make CPU=armv6m
-
-# Load bitstream onto target board
-make run
-```
-
-#### Running helloworld on the target
-
-```
-
-# Find correct tty port (replace /dev/ttyUSB1 as appropriate)...
-
-# Run FW on target
-./run.py -d /dev/ttyUSB1 -f prebuilt/helloworld_riscv.elf 
-ELF: Loading 0x0 - size 15KB
- |XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX| 100.0% 
-helloworld!
-helloworld!
-helloworld!
-helloworld!
-helloworld!
-helloworld!
-helloworld!
-helloworld!
-```

@@ -28,6 +28,8 @@
 // USA
 //-----------------------------------------------------------------
 
+//`define CHIP_SCOPE = 1
+
 //-----------------------------------------------------------------
 //                          Generated File
 //-----------------------------------------------------------------
@@ -354,6 +356,11 @@ end
 
 wire        inport_awvalid_w = inport_awvalid_i | awvalid_q;
 wire [31:0] inport_awaddr_w  = awvalid_q ? awaddr_q : inport_awaddr_i;
+
+`ifdef CHIP_SCOPE
+(* mark_debug = "TRUE" *) (* KEEP = "TRUE" *) (* S = "TRUE" *) wire  [31:0]  debug_inport_awaddr_i;
+assign debug_inport_awaddr_i = inport_awaddr_i;
+`endif
 
 //-----------------------------------------------------------------
 // Write Dist

@@ -96,7 +96,7 @@ struct {
    {BANK,  0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
    {BANK,  0xb0, 0x3c }, // KON/Block/FNUM_H
 
-#if 0
+#if 1
 #undef BANK
 #define BANK   1
 

@@ -1,4 +1,4 @@
-
+// `define CHIP_SCOPE = 1
 
 module audio(
     input wire  clk25,
@@ -14,6 +14,24 @@ module audio(
     input  wire audio_sample_clk
     );
 
+`ifdef CHIP_SCOPE
+(* mark_debug = "TRUE" *) wire  debug_clk25;
+(* mark_debug = "TRUE" *) wire  debug_reset25;
+(* mark_debug = "TRUE" *) wire debug_codec_bclk_i;
+(* mark_debug = "TRUE" *) wire debug_codec_dacdat;
+(* mark_debug = "TRUE" *) wire debug_codec_daclrc;
+(* mark_debug = "TRUE" *) wire [15:0] debug_audio_right_sample;
+(* mark_debug = "TRUE" *) wire debug_audio_sample_clk;
+
+assign debug_clk25 = clk25;
+assign debug_reset25 = reset25;
+assign debug_codec_bclk_i = codec_bclk_i;
+assign debug_codec_dacdat = codec_dacdat;
+assign debug_codec_daclrc = codec_daclrc;
+assign debug_audio_right_sample = audio_right_sample;
+assign debug_audio_sample_clk = audio_sample_clk;
+`endif
+
 // The sampling rate for real opl3 is 14.31818MHz/288 = 49715.2777.
 // The Wolfson codec supports sample rates of 8kHz, 11.025kHz, 12kHz,
 // 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz and 96kHz.
@@ -24,7 +42,7 @@ module audio(
 // When using a 48Khz sampling rate the choices are 250fs, 256fs or 384fs.
 // 
 // Considering the above and after much experimentation it was decided to
-// use a sampling rate of 50 Khz (25 MHz/500) which is 57% faster than ideal.
+// use a sampling rate of 50 Khz (25 MHz/500) which is 0.57% faster than ideal.
 // MCLK and BCLK are 250fs (25 Mhz / 2).
 
     reg [5:0]  bit_cntr;

@@ -48,6 +48,8 @@
 
 `include "opl3.vh"
 
+// `define CHIP_SCOPE = 1
+
 module opl3(
   clk,       // 100 MHz system clock
   clk_opl3,  // 25 MHz OPL2 clock
@@ -73,6 +75,17 @@ module opl3(
   output signed [15:0] channel_d;
   output sample_clk;
   output sample_clk_128;
+
+`ifdef CHIP_SCOPE
+(* mark_debug = "TRUE" *) wire  debug_clk;
+(* mark_debug = "TRUE" *) wire  debug_opl3_we;
+(* mark_debug = "TRUE" *) wire  [7:0]   debug_opl3_data;
+(* mark_debug = "TRUE" *) wire  [8:0]   debug_opl3_adr;
+assign debug_clk = clk;
+assign debug_opl3_we = opl3_we;
+assign debug_opl3_data = opl3_data;
+assign debug_opl3_adr = opl3_adr;
+`endif
 
   localparam OPERATOR_PIPELINE_DELAY = 7; 
   localparam NUM_OPERATOR_UPDATE_STATES = `NUM_BANKS*`NUM_OPERATORS_PER_BANK + 1; // 36 operators + idle state

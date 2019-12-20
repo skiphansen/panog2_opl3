@@ -87,7 +87,7 @@ assign cfg_bresp_o  = 2'b0;
 opl3 opl3_u (
     .clk(clk_i),  // system clock
     .clk_opl3(clk_opl3),  // 25 MHz OPL2 clock
-    .opl3_we(read_en_w),   // register write
+    .opl3_we(write_en_w),   // register write
     .opl3_data(cfg_wdata_i[7:0]), // register data
     .opl3_adr(cfg_awaddr_i[10:2]),  // register address
     .channel_a(channel_a),
