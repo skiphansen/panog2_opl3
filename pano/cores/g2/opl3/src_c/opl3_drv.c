@@ -4,8 +4,8 @@
 #include "pano_io.h"
 #include "opl3_drv.h"
 
-#define DEBUG_LOGGING
-#define VERBOSE_DEBUG_LOGGING
+// #define DEBUG_LOGGING
+// #define VERBOSE_DEBUG_LOGGING
 #include "log.h"
 
 const uint8_t OpOffset[] = {

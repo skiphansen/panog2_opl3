@@ -12,12 +12,20 @@ EXTRA_CFLAGS += -DCONFIG_UARTLITE_BASE=0x92000000
 EXTRA_CFLAGS += -DCONFIG_SPILITE
 EXTRA_CFLAGS += -DCONFIG_SPILITE_BASE=0x93000000
 
-TOPDIR	     = ../../../..
-SRC_DIR      = ./ 
-SRC_DIR     += $(TOPDIR)/soc/core_soc/src_c
-SRC_DIR     += $(TOPDIR)/src_c/drivers
-SRC_DIR     += ../spiffs
-EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
+TOPDIR	     = ../..
+SRC_DIR      = .
+SRC_DIR     += $(CORES_DIR)/core_soc/src_c
+SRC_DIR     += $(PANO_FW_DIR)/lib/libstd
+SRC_DIR     += $(PANO_CORES_DIR)/g2/opl3/src_c
+# SRC_DIR     += $(TOPDIR)/src_c/drivers
+EXTRA_SRC   += $(PANO_FW_DIR)/common/i2c.c
+EXTRA_SRC   += $(PANO_FW_DIR)/common/audio.c
+EXTRA_SRC   += $(PANO_FW_DIR)/common/log.c
+#SRC_DIR     += ../spiffs
+#EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
+
+INCLUDE_PATH += ../include
+INCLUDE_PATH += $(PANO_FW_DIR)/common
 
 BASE_ADDRESS  = 0x0
 OPT           = 2
@@ -30,13 +38,13 @@ RUN_PREFIX  := $(TOPDIR)/run.py -d $(TARGET_PORT) -b 1000000 -f
 #DRO_FILE = opl3dro/doom_035.dro
 #DRO_FILE = opl3dro/doom_036.dro
 
-#DRO_FILE = opl3dro/doom2_000.dro
+DRO_FILE = opl3dro/doom2_000.dro
 #DRO_FILE = opl3dro/doom2_001.dro
 #DRO_FILE = opl3dro/doom2_002.dro
 #DRO_FILE = opl3dro/doom2_003.dro
 #DRO_FILE = opl3dro/doom2_013.dro
 #DRO_FILE = opl3dro/doom2_014.dro
-DRO_FILE = opl3dro/doom2_015.dro
+#DRO_FILE = opl3dro/doom2_015.dro
 #DRO_FILE = opl3dro/doom2_016.dro
 #DRO_FILE = opl3dro/doom2_031.dro
 #DRO_FILE = opl3dro/doom2_032.dro
@@ -53,8 +61,7 @@ DRO_FILE = opl3dro/doom2_015.dro
 
 CLEAN_FILES += mfs_file.h
 
-MAKE_DIR=../make
-include $(MAKE_DIR)/common.mk
+include $(TOPDIR)/pano/make/c_prog.mk
 
 BIN2C := $(TOPDIR)/tools/bin2c/bin2c
 

@@ -46,8 +46,8 @@ subject to the following restrictions:
 #include "timer_ps.h"
 #else
 #include "pano_io.h"
-#include "pano_time.h"
-void TimerDelay(uint32_t x);
+#include "timer.h"
+#define TimerDelay(x) timer_sleep_us(x)
 #define XUartPs_IsReceiveData(x)  0
 #define XPAR_OPL3_FPGA_0_S_AXI_BASEADDR   0
 #define XPAR_PS7_UART_1_BASEADDR          0
