@@ -1,0 +1,9 @@
+[submodule "cores/core_soc"]
+	path = cores/core_soc
+	url = https://github.com/ultraembedded/core_soc.git
+[submodule "cores/dbg_bridge"]
+	path = cores/dbg_bridge
+	url = https://github.com/ultraembedded/core_dbg_bridge.git
+[submodule "cores/cpu/riscv"]
+	path = cores/cpu/riscv
+	url = https://github.com/ultraembedded/riscv.git
