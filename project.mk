@@ -1,6 +1,8 @@
 ARCH         = riscv
-PLATFORM     ?= g2
-EXTRA_CFLAGS += -DPLATFORM_$(PLATFORM)
+
+TEMP = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+TOPDIR := $(TEMP:/=)
+
 BASE_ADDRESS  = 0x0
 
 # hardware defines

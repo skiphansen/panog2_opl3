@@ -4,7 +4,6 @@ run
 -ifn fpga.prj
 -ofn fpga
 -ofmt NGC
--p xc6slx150-2-fgg484
 -top top
 -opt_mode Speed
 -opt_level 1

@@ -1,7 +1,6 @@
-TARGET       = imfplay
+include ../../project.mk
 
-TOPDIR	     = ../..
-include ../include/platform.mk
+TARGET       = imfplay
 
 SRC_DIR      = .
 SRC_DIR     += $(CORES_DIR)/core_soc/src_c
@@ -19,8 +18,6 @@ INCLUDE_PATH += $(PANO_FW_DIR)/common
 
 OPT           = 2
 ENABLE_LST    = yes
-
-BUILD_TARGETS += ../firmware.mem
 
 include $(TOPDIR)/pano/make/c_prog.mk
 

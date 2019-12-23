@@ -71,6 +71,7 @@ ifeq ($(FPIC), yes)
 CFLAGS       += -fpic
 endif
 CFLAGS       += $(patsubst %,-I%,$(INCLUDE_PATH))
+CFLAGS 	     += -DPLATFORM=$(PLATFORM)
 CFLAGS       += $(EXTRA_CFLAGS)
 
 LFLAGS       += $(ARCH_LFLAGS)

@@ -1,7 +1,6 @@
-TARGET       = blinky
+include ../../project.mk
 
-TOPDIR	     = ../..
-include ../include/platform.mk
+TARGET       = blinky
 
 # source to include
 SRC_DIR      = .

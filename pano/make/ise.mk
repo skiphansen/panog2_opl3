@@ -1,17 +1,5 @@
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/common.mk
 
-ifeq ($(QUIET),yes)
-MV	     = @mv
-CP	     = @cp
-LN	     = @ln
-DATA2MEM     = @data2mem   
-else
-MV	     = mv
-CP	     = cp   
-LN	     = ln
-DATA2MEM     = data2mem   
-endif
-
 ###############################################################################
 ## Params
 ###############################################################################
@@ -23,25 +11,22 @@ PROJECT      ?= fpga
 ###############################################################################
 # Checks
 ###############################################################################
-ifeq ($(PANO_SERIES),)
-$(error PANO_SERIES not set)
-endif
 
-ifeq ($(PANO_SERIES),g2)
-  ifeq ($(PANO_REV_C),yes)
+ifeq ($(PLATFORM),pano-g2-c)
     PART_NAME    = xc6slx100
     PART_PACKAGE = fgg484
     PART_SPEED   = 2
-  else
+    PANO_SERIES  = g2
+else ifeq ($(PLATFORM),pano-g2)
     PART_NAME    = xc6slx150
     PART_PACKAGE = fgg484
     PART_SPEED   = 2
-  endif
+    PANO_SERIES  = g2
+else
+   $(error Unknown PLATFORM $(PLATFORM))
 endif
 
-ifeq ($(PART_NAME),)
-$(error unknown PANO_SERIES $(PANO_SERIES))
-endif
+PLATFORM_BITFILE = $(PREBUILT_DIR)/$(PLATFORM).bit
 
 TOP_MODULE   ?= top
 
@@ -55,7 +40,7 @@ SRC_FILES := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $
 ###############################################################################
 # Rules:
 ###############################################################################
-all: bitstream $(PREBUILT_DIR)/$(PART_NAME).bit
+all: bitstream $(PLATFORM_BITFILE)
 
 BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
 
@@ -80,6 +65,7 @@ $(PROJECT_DIR)/$(PROJECT).ut: | $(PROJECT_DIR)
 $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 	if [ -e $(PROJECT).xst ]; then cp $(PROJECT).xst $(PROJECT_DIR); else \
 	cp $(MAKE_DIR)/default.xst $(PROJECT_DIR)/$(PROJECT).xst; fi
+	echo "-p $(PART_NAME)-$(PART_SPEED)-$(PART_PACKAGE)" >> $@
 
 ###############################################################################
 # PROJECT.prj
@@ -87,7 +73,6 @@ $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 $(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
 	@touch $@
 	@$(foreach _file,$(SRC_FILES),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
-	@touch $(PROJECT_DIR)/dummy.bmm
 ###############################################################################
 # PROJECT.ucf
 ###############################################################################
@@ -148,8 +133,8 @@ $(BIT_FILE): $(PROJECT_DIR)/$(PROJECT)_routed.ncd
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/bitgen -f $(PROJECT).ut $(PROJECT)_routed.ncd
 
-$(PREBUILT_DIR)/$(PART_NAME).bit: $(BIT_FILE)
-	@cp $(BIT_FILE) $(PREBUILT_DIR)/$(PART_NAME).bit
+$(PLATFORM_BITFILE) : $(BIT_FILE)
+	@cp $(BIT_FILE) $(PLATFORM_BITFILE)
 
 ###############################################################################
 # Rule: Bitstream -> binary
@@ -164,22 +149,22 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 # Rule: Load Bitstream using XC2PROG
 ###############################################################################
 load:
-	$(XC3SPROG) $(XC3SPROG_OPTS) $(PREBUILT_DIR)/$(PART_NAME).bit
+	$(XC3SPROG) $(XC3SPROG_OPTS) $(PLATFORM_BITFILE)
 
 ###############################################################################
 # Rule: Upate Bitstream with new firmware image
 ###############################################################################
 update_ram:
-	$(DATA2MEM) -bm firmware_bd.bmm -bt $(BIT_FILE) -bd $(RTL_INIT_MEM) -o b $(BIT_FILE).new.bit
-	$(DATA2MEM) -bm firmware_bd.bmm -bt $(BIT_FILE).new.bit -d > $(BIT_FILE).new.bit.dump
-	$(MV) $(BIT_FILE) $(BIT_FILE).orig
-	$(MV) $(BIT_FILE).new.bit $(BIT_FILE)
+	$(Q)data2mem -bm firmware_bd.bmm -bt $(BIT_FILE) -bd $(RTL_INIT_MEM) -o b $(BIT_FILE).new.bit
+	$(Q)data2mem -bm firmware_bd.bmm -bt $(BIT_FILE).new.bit -d > $(BIT_FILE).new.bit.dump
+	$(Q)mv $(BIT_FILE) $(BIT_FILE).orig
+	$(Q)mv $(BIT_FILE).new.bit $(BIT_FILE)
 
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG
 ###############################################################################
 BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit   
-prog_fpga: $(PREBUILT_DIR)/$(PROJECT).bit
-	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/$(PART_NAME).bit
+prog_fpga: $(PLATFORM_BITFILE)
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE)
 
 

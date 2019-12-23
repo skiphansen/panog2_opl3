@@ -1,20 +1,19 @@
-# Choice: g1, g2
-PANO_SERIES ?= g2
-
-# Set to yes for second generation, rev C (lx100 FPGA)
-PANO_REV_C  ?= no
-
-# Set to no to watch the gory details
-QUIET        ?= yes
-
-ifeq ($(TOPDIR),)
-   $(error TOPDIR not set)
+ifneq ($(PLATFORM),)
+# Save PLATFORM that is specified so we don't need to specify it every time
+   $(shell echo $(PLATFORM) > $(TOPDIR)/.platform)
+else
+   ifneq ("$(wildcard $(TOPDIR)/.platform)","")
+   # Use last PLATFORM specified
+      PLATFORM := $(shell cat $(TOPDIR)/.platform)
+   else
+   # Use default
+      PLATFORM := pano-g2
+   endif
 endif
 
 ifeq ($(V),)
    Q=@
 endif
-
 
 # directory related
 MAKE_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))

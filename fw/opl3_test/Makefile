@@ -1,7 +1,6 @@
-TARGET       = opl3_test
+include ../../project.mk
 
-TOPDIR	     = ../..
-include ../include/platform.mk
+TARGET       = opl3_test
 
 SRC_DIR      = .
 SRC_DIR     += $(CORES_DIR)/core_soc/src_c

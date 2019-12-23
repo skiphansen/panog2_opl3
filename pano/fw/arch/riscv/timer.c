@@ -26,8 +26,7 @@ void timer_sleep(int timeMs)
 {
     t_time t = timer_now();
 
-    while (timer_diff(timer_now(), t) < timeMs)
-        ;
+    while (timer_now() - t < timeMs);
 }
 
 void timer_sleep_us(int timeUs)
