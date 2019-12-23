@@ -365,7 +365,28 @@ u_soc
 );
 
 
-assign rst_cpu_w       = ~enable_w[0];
+// enable_w[0] from the dbg_bridge is used for a reset, but  we want to 
+// come up running so ignore it until it has been asserted and released once
+reg bridge_rst_enable;
+reg rst_cpu_r;
+
+always @(posedge clk_i) 
+    if (rst_i) begin
+        bridge_rst_enable <= 0;
+        rst_cpu_r <= 1;
+    end
+    else begin
+        if(!bridge_rst_enable)
+            bridge_rst_enable <= enable_w[0];
+
+        if(bridge_rst_enable)
+            rst_cpu_r <= ~enable_w[0];
+        else
+            rst_cpu_r <= 0;
+    end
+
+
+assign rst_cpu_w       = rst_cpu_r;
 assign cpu_intr_w      = {31'b0, soc_intr_w};
 
 

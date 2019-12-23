@@ -1,5 +1,17 @@
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/common.mk
 
+ifeq ($(QUIET),yes)
+MV	     = @mv
+CP	     = @cp
+LN	     = @ln
+DATA2MEM     = @data2mem   
+else
+MV	     = mv
+CP	     = cp   
+LN	     = ln
+DATA2MEM     = data2mem   
+endif
+
 ###############################################################################
 ## Params
 ###############################################################################
@@ -75,7 +87,7 @@ $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 $(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
 	@touch $@
 	@$(foreach _file,$(SRC_FILES),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
-
+	@touch $(PROJECT_DIR)/dummy.bmm
 ###############################################################################
 # PROJECT.ucf
 ###############################################################################
@@ -102,7 +114,7 @@ $(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_DIR)/$(PROJECT).ngc $(UCF_FILE)
 	@echo "# ISE: Convert netlist"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/ngdbuild -intstyle ise -dd _ngo -nt timestamp \
-	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT).ngc $(PROJECT).ngd
+	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT).ngc $(PROJECT).ngd -bm ../firmware.bmm
 
 ###############################################################################
 # Rule: Map
@@ -153,6 +165,15 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 ###############################################################################
 load:
 	$(XC3SPROG) $(XC3SPROG_OPTS) $(PREBUILT_DIR)/$(PART_NAME).bit
+
+###############################################################################
+# Rule: Upate Bitstream with new firmware image
+###############################################################################
+update_ram:
+	$(DATA2MEM) -bm firmware_bd.bmm -bt $(BIT_FILE) -bd $(RTL_INIT_MEM) -o b $(BIT_FILE).new.bit
+	$(DATA2MEM) -bm firmware_bd.bmm -bt $(BIT_FILE).new.bit -d > $(BIT_FILE).new.bit.dump
+	$(MV) $(BIT_FILE) $(BIT_FILE).orig
+	$(MV) $(BIT_FILE).new.bit $(BIT_FILE)
 
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG

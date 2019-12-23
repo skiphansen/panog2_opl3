@@ -47,20 +47,16 @@ BUILD_DIR      ?= build
 ###############################################################################
 # Variables: GCC
 ###############################################################################
-QUIET        ?= yes
-
 GCC_PREFIX   ?= 
 COMPILER     ?= g++
 
-ifeq ($(QUIET),yes)
-GCC          = @$(GCC_PREFIX)$(COMPILER)
-OBJCOPY      = @$(GCC_PREFIX)objcopy
-OBJDUMP      = @$(GCC_PREFIX)objdump
-else
 GCC          = $(GCC_PREFIX)$(COMPILER)
 OBJCOPY      = $(GCC_PREFIX)objcopy
 OBJDUMP      = $(GCC_PREFIX)objdump
-endif
+CP	     = cp   
+LN	     = ln
+DATA2MEM     = data2mem   
+CREATE_MIF   = $(TOOLS_DIR)/create_mif.rb   
 
 ###############################################################################
 # Variables: Compilation flags
@@ -102,48 +98,61 @@ DEPFLAGS      = -MT $$@ -MMD -MP -MF $(call src2dep,$(1))
 define template_c
 $(call src2obj,$(1)): $(1) | $(BUILD_DIR)/ $(BUILD_DIR)/
 	@echo "# Compiling $(notdir $(1))"
-	$(GCC) $(CFLAGS) $(DEPFLAGS) -c $$< -o $$@
+	$(Q)$(GCC) $(CFLAGS) $(DEPFLAGS) -c $$< -o $$@
 endef
 
 ###############################################################################
 # Rules
 ###############################################################################
-BUILD_TARGETS = $(BUILD_DIR)/$(TARGET)
+BUILD_TARGETS += $(BUILD_DIR)/$(TARGET)
 
 ifeq ($(ENABLE_BIN),yes)
   BUILD_TARGETS += $(BUILD_DIR)/$(TARGET).bin
+  BUILD_TARGETS += $(PREBUILT_DIR)/firmware.mem
 endif
 ifeq ($(ENABLE_LST),yes)
   BUILD_TARGETS += $(BUILD_DIR)/$(TARGET).lst
 endif
 
+.PHONY: all init_image run clean load update_ram
+
 all: $(BUILD_TARGETS)
 
 $(BUILD_DIR)/:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 $(foreach src,$(SRC),$(eval $(call template_c,$(src))))
 
 $(BUILD_DIR)/$(TARGET): $(OBJ) | $(BUILD_DIR)/ 
 	@echo "# Building $(notdir $@)"
-	$(GCC) -o $(BUILD_DIR)/$(TARGET) $(OBJ) $(LFLAGS)
+	$(Q)$(GCC) -o $(BUILD_DIR)/$(TARGET) $(OBJ) $(LFLAGS)
 
 $(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
-	$(OBJCOPY) -O binary $< $@
+	$(Q)$(OBJCOPY) -O binary $< $@
 
 $(BUILD_DIR)/$(TARGET).lst: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
-	$(OBJDUMP) -d $< > $@
+	$(Q)$(OBJDUMP) -d $< > $@
+
+$(RTL_INIT_MEM): $(BUILD_DIR)/$(TARGET).bin
+	@echo "# Building $(notdir $@)"
+	$(Q)$(CREATE_MIF) -d 16384 -f mem -w 32 -o 0 -i 1 $(BUILD_DIR)/$(TARGET).bin > $(RTL_INIT_MEM)
+
+init_image: $(RTL_INIT_MEM)	
 
 run: $(BUILD_DIR)/$(TARGET)
 	$(RUN_PREFIX) $(BUILD_DIR)/$(TARGET) $(RUN_ARGS)
 
 clean:
-	rm -rf $(BUILD_DIR)
+	$(Q)rm -rf $(BUILD_DIR)
 
 load:
-	make -C $(TOPDIR)/fpga load
+	$(Q)make -C $(PANO_RTL_DIR) load
+
+update_ram:
+	$(Q)make -C $(PANO_RTL_DIR) update_ram
+
 
 ###############################################################################
 # Rules: Dependancies
@@ -152,3 +161,4 @@ EXCLUDE_DEPS := clean
 ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(EXCLUDE_DEPS))))
 -include $(DEPS)
 endif
+

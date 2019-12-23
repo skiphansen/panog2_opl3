@@ -1,18 +1,8 @@
 TARGET       = imfplay
-ARCH         = riscv
-PLATFORM     = machine-fpga
-
-EXTRA_CFLAGS+= -DCPU_KHZ=50000
-
-# UART driver
-EXTRA_CFLAGS += -DCONFIG_UARTLITE
-EXTRA_CFLAGS += -DCONFIG_UARTLITE_BASE=0x92000000
-
-# SPI driver
-EXTRA_CFLAGS += -DCONFIG_SPILITE
-EXTRA_CFLAGS += -DCONFIG_SPILITE_BASE=0x93000000
 
 TOPDIR	     = ../..
+include ../include/platform.mk
+
 SRC_DIR      = .
 SRC_DIR     += $(CORES_DIR)/core_soc/src_c
 SRC_DIR     += $(PANO_FW_DIR)/lib/libstd
@@ -27,11 +17,10 @@ EXTRA_SRC   += $(PANO_FW_DIR)/common/spiffs_drv.c
 INCLUDE_PATH += ../include
 INCLUDE_PATH += $(PANO_FW_DIR)/common
 
-BASE_ADDRESS  = 0x0
 OPT           = 2
-ENABLE_LST = yes
+ENABLE_LST    = yes
+
+BUILD_TARGETS += ../firmware.mem
 
 include $(TOPDIR)/pano/make/c_prog.mk
-
-
 

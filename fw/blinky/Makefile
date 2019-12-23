@@ -1,15 +1,7 @@
 TARGET       = blinky
-ARCH         = riscv
-PLATFORM     = machine-fpga
 
-# hardware defines
-BASE_ADDRESS  = 0x0
-CPU_KHZ       = 75000
-EXTRA_CFLAGS+= -DCPU_KHZ=$(CPU_KHZ)
-
-# UART driver
-EXTRA_CFLAGS += -DCONFIG_UARTLITE
-EXTRA_CFLAGS += -DCONFIG_UARTLITE_BASE=0x92000000
+TOPDIR	     = ../..
+include ../include/platform.mk
 
 # source to include
 SRC_DIR      = .
@@ -20,9 +12,8 @@ INCLUDE_PATH += ../include
 INCLUDE_PATH += $(PANO_FW_DIR)/common
 
 # build optons
-OPT           = 2
-ENABLE_LST=yes
+OPT        = 2
+ENABLE_LST = yes
 
-TOPDIR = ../..
 include $(TOPDIR)/pano/make/c_prog.mk
 

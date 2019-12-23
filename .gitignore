@@ -2,10 +2,12 @@
 *.log
 *.vcd
 *.a
+*_bd.bmm
 build/
 lib/
 obj/
 obj_verilated/
 verilated/
 ise/work/
+fpga/firmware.mem
 

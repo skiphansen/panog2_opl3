@@ -45,6 +45,7 @@ subject to the following restrictions:
 #include "audio_demo.h"
 #include "timer_ps.h"
 #else
+#include <stdbool.h>
 #include "pano_io.h"
 #include "timer.h"
 #define TimerDelay(x) timer_sleep_us(x)
@@ -52,6 +53,7 @@ subject to the following restrictions:
 #define XPAR_OPL3_FPGA_0_S_AXI_BASEADDR   0
 #define XPAR_PS7_UART_1_BASEADDR          0
 void Opl3WriteReg(uint8_t chip,uint16_t RegOffset,uint8_t Data);
+bool ButtonJustPressed(void);
 
 #define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
@@ -440,7 +442,12 @@ int imfplay(char *filename)
          for (long clock_ticks = 0; clock_ticks < next_event; clock_ticks++)
          // usleep((1/freq_div)*1000000);
             TimerDelay(1000);
-
+#ifdef PANO_PORT
+      // Abort playback of current file if button is clicked
+         if(ButtonJustPressed()) {
+            break;
+         }
+#endif
          res = read_next_cmd(&f, &c);
          if (res == CMD_EOF)
             run = 0;

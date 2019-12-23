@@ -23,8 +23,9 @@ The eventual plan is to use this core on other projects to do more interesting
 things.
 
 ## Status
-The project builds and the all of the test files from the orginal project play.  
-
+The project builds and the all of the test files from the orginal project play.
+This is a work in progress.  The rev C (xc6slx100 part) is not supported
+currently, but support will be added shortly.
 
 ## HW Requirements
 
@@ -34,9 +35,38 @@ The project builds and the all of the test files from the orginal project play.
 * A serial port compatible with 5 volt logic levels.
 * A custom able to connect the serial port to the Pano.
 
-## Serial cable
 Please see fpga_test_soc for the [pano](https://github.com/skiphansen/fpga_test_soc/blob/master/fpga/panologic_g2/README.md) for 
 more information on the needed cable.
+
+## Software Requirements
+
+* Xilinx [ISE 14.7](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html)
+* xc3sprog
+* gcc built for RISC-V RV32IM
+* GNU make
+
+The free Webpack version of Xilinx [ISE 14.7](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html) is used for development.
+Download the latest Windows 10 version which supports the Spartan 6 family of 
+chips used in the second generation Panologic device.
+
+
+### Building bitfile from sources
+
+**NB:** While it may be possible to use Windows for development I haven't 
+tried it and don't recommend it.
+
+1. Clone the https://github.com/skiphansen/panog2_opl3 repository
+2. cd into .../panog2_opl3/fpga
+3. If you have a **REV B** Pano with the larger FPGA then just run "make".
+
+### Building the firmware 
+
+To build the firmware, make sure the RISC-V GCC (built for RV32IM) is in the 
+PATH, then:
+
+1. cd into .../panog2_opl3/fw/imfplay
+2. run make.
+
 
 
 ## Acknowledgement and Thanks

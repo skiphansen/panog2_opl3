@@ -13,6 +13,7 @@
 #include "spi_lite.h"
 #include "spiffs_drv.h"
 #include "printf.h"
+#include "gpio_defs.h"
 
 #define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
@@ -105,5 +106,31 @@ void PlayFiles(spiffs *pFS)
     }
     SPIFFS_closedir(&dir);
     printf("\nTotal %ld\n",Total);
+}
+
+#define REG_RD(reg)                *((volatile uint32_t *)(reg))
+
+bool ButtonJustPressed()
+{
+   static uint32_t ButtonLast = 3;
+   uint32_t Temp;
+   int Ret = 0;
+   static t_time LastCalled = 0;
+   t_time TimeNow = timer_now();
+
+   if(timer_diff(TimeNow,LastCalled) > 50) {
+   // Only check at the most once every 50 milliseconds for switch debounce
+      LastCalled = TimeNow;
+      Temp = REG_RD(GPIO_BASE + GPIO_INPUT) & GPIO_BIT_PANO_BUTTON;
+      if(ButtonLast != 3 && ButtonLast != Temp) {
+         if(Temp == 0) {
+            printf("Pano button pressed\n");
+            Ret = 1;
+         }
+      }
+      ButtonLast = Temp;
+   }
+
+   return Ret;
 }
 
