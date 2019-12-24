@@ -49,10 +49,3 @@ endif
 prog_fs:
 	$(XC3SPROG) $(XC3SPROG_OPTS) $(BULK_ERASE) -I$(BSCAN_SPI_BITFILE) $(FS_IMAGE):w:$(OFFSET):bin
 
-#${CORES_README}:
-#	git submodule init
-#	git submodule update
-
-
-
-

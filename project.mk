@@ -1,7 +1,9 @@
 ARCH         = riscv
 
+GIT_INIT := $(shell if [ ! -e pano/.git ]; then git submodule init; git submodule update; fi)
 TEMP = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TOPDIR := $(TEMP:/=)
+
 
 BASE_ADDRESS  = 0x0
 
