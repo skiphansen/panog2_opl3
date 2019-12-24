@@ -37,8 +37,17 @@ PAR_CMDS = -w -intstyle ise -ol high  -mt 4
 TOPDIR = ..
 include $(TOPDIR)/pano/make/ise.mk
 
+ifeq ($(PLATFORM),pano-g2-c)
+   FS_IMAGE = $(PREBUILT_DIR)/dro_test_spiffs-g2-c.img
+   OFFSET = 5111808
+   BULK_ERASE = -e
+else
+   FS_IMAGE = $(PREBUILT_DIR)/dro_test_spiffs.img
+   OFFSET = 9043968
+endif
+
 prog_fs:
-	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PREBUILT_DIR)/dro_test_spiffs.img:W:9043968:bin
+	$(XC3SPROG) $(XC3SPROG_OPTS) $(BULK_ERASE) -I$(BSCAN_SPI_BITFILE) $(FS_IMAGE):w:$(OFFSET):bin
 
 #${CORES_README}:
 #	git submodule init

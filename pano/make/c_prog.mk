@@ -66,12 +66,18 @@ CREATE_MIF   = $(TOOLS_DIR)/create_mif.rb
 INCLUDE_PATH += $(SRC_DIR)
 
 # Flags
-CFLAGS       = $(ARCH_CFLAGS) -O$(OPT)
+ifeq ($(PLATFORM),pano-g2-c)
+    CFLAGS = -DPANO_G2_C
+else ifeq ($(PLATFORM),pano-g2)
+    CFLAGS = -DPANO_G2
+else
+   $(error Unknown PLATFORM $(PLATFORM))
+endif
+CFLAGS       += $(ARCH_CFLAGS) -O$(OPT)
 ifeq ($(FPIC), yes)
 CFLAGS       += -fpic
 endif
 CFLAGS       += $(patsubst %,-I%,$(INCLUDE_PATH))
-CFLAGS 	     += -DPLATFORM=$(PLATFORM)
 CFLAGS       += $(EXTRA_CFLAGS)
 
 LFLAGS       += $(ARCH_LFLAGS)
@@ -150,6 +156,9 @@ clean:
 
 load:
 	$(Q)make -C $(PANO_RTL_DIR) load
+
+prog_fpga:
+	$(Q)make -C $(PANO_RTL_DIR) prog_fpga
 
 update_ram:
 	$(Q)make -C $(PANO_RTL_DIR) update_ram

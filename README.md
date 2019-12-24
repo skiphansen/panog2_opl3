@@ -33,22 +33,25 @@ currently, but support will be added shortly.
 * A suitable 5 volt power supply
 * A JTAG programmer to load the bitstream into the FPGA.
 * A serial port compatible with 5 volt logic levels.
-* A custom able to connect the serial port to the Pano.
 
 Please see fpga_test_soc for the [pano](https://github.com/skiphansen/fpga_test_soc/blob/master/fpga/panologic_g2/README.md) for 
 more information on the needed cable.
 
 ## Software Requirements
 
-* Xilinx [ISE 14.7](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html)
 * xc3sprog
-* gcc built for RISC-V RV32IM
 * GNU make
+
+If you would like to play with the firmware you'll also need:
+
+* gcc built for RISC-V RV32IM
+
+If you would like to play with the RTL you'll also need:
+* Xilinx [ISE 14.7](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html)
 
 The free Webpack version of Xilinx [ISE 14.7](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html) is used for development.
 Download the latest Windows 10 version which supports the Spartan 6 family of 
 chips used in the second generation Panologic device.
-
 
 ### Building bitfile from sources
 
@@ -66,7 +69,6 @@ PATH, then:
 
 1. cd into .../panog2_opl3/fw/imfplay
 2. run make.
-
 
 
 ## Acknowledgement and Thanks

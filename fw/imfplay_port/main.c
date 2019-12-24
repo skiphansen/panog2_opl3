@@ -118,7 +118,7 @@ bool ButtonJustPressed()
    static t_time LastCalled = 0;
    t_time TimeNow = timer_now();
 
-   if(timer_diff(TimeNow,LastCalled) > 50) {
+   if((TimeNow - LastCalled) > 50) {
    // Only check at the most once every 50 milliseconds for switch debounce
       LastCalled = TimeNow;
       Temp = REG_RD(GPIO_BASE + GPIO_INPUT) & GPIO_BIT_PANO_BUTTON;

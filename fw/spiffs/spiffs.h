@@ -11,10 +11,12 @@
 extern "C" {
 #endif
 
-#ifndef REV_C
+#if defined(PANO_G2)
 #include "spiffs_config_g2.h"
-#else
+#elif defined(PANO_G2_C)
 #include "spiffs_config_g2_revc.h"
+#else
+#error Unknown PLATFORM
 #endif
 
 #define SPIFFS_OK                       0

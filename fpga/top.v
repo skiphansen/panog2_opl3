@@ -230,8 +230,8 @@ assign right_pre = channel_b + channel_d;
 
 wire signed [15:0] left, right;
 
-assign left = left_pre > 32767 ? 16'hffff : left_pre < -32768 ? 16'h0000 : left_pre[15:0];
-assign right = right_pre > 32767 ? 16'hffff : right_pre < -32768 ? 16'h0000: right_pre[15:0];
+assign left = left_pre > 32767 ? 32767 : left_pre < -32768 ? -32768 : left_pre[15:0];
+assign right = right_pre > 32767 ? 32767 : right_pre < -32768 ? -32768 : right_pre[15:0];
 
 reset_gen reset_gen_25 (
     .clk_i(clk25)
