@@ -7,3 +7,6 @@
 [submodule "cores/cpu/riscv"]
 	path = cores/cpu/riscv
 	url = https://github.com/ultraembedded/riscv.git
+[submodule "pano"]
+	path = pano
+	url = https://github.com/skiphansen/pano_blocks
