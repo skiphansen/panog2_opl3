@@ -21,3 +21,17 @@ ENABLE_LST    = yes
 
 include $(TOPDIR)/pano/make/c_prog.mk
 
+.PHONY: filesystem
+
+PREBUILT := $(TOPDIR)/prebuilt
+G2_FS 	 := $(PREBUILT)/dro_test_spiffs.img
+G2_C_FS  := $(PREBUILT)/dro_test_spiffs-g2-c.img
+
+filesystem: $(G2_FS) $(G2_C_FS)
+
+$(G2_FS): $(MKSPIFFS)
+	$(Q)$(MKSPIFFS)  -c opl3dro -b 131072 -p 256 -s 7733248 $@ > $(TTY)
+
+$(G2_C_FS): $(MKSPIFFS)
+	$(Q)$(MKSPIFFS) -c opl3dro -b 65536 -p 256 -s 3276800 $@ > $(TTY)
+

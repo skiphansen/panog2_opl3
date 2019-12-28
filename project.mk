@@ -1,10 +1,9 @@
-ARCH         = riscv
-
-GIT_INIT := $(shell if [ ! -e pano/.git ]; then git submodule init; git submodule update; fi)
 TEMP = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TOPDIR := $(TEMP:/=)
 
+GIT_INIT := $(shell if [ ! -e $(TOPDIR)/pano/.git ]; then echo "updating submodules"> /dev/stderr;git submodule init; git submodule update; fi)
 
+ARCH         = riscv
 BASE_ADDRESS  = 0x0
 
 # hardware defines
