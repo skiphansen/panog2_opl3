@@ -23,6 +23,8 @@ EXCLUDE_SRC += $(CORES_DIR)/cpu/riscv/top_tcm_wrapper/tcm_mem_ram.v
 BSCAN_SPI_DIR = $(PANO_CORES_DIR)/xc3sprog
 
 COMPRESS_BITFILE = yes
+INIT_IMAGE = ./firmware.mem
+
 #MAP_CMDS = -w -intstyle ise -detail -ir off -ignore_keep_hierarchy -ol high
 
 # NB: the -pr b option was removed from the default options, otherwise there 
@@ -49,3 +51,5 @@ endif
 prog_fs:
 	$(XC3SPROG) $(XC3SPROG_OPTS) $(BULK_ERASE) -I$(BSCAN_SPI_BITFILE) $(FS_IMAGE):w:$(OFFSET):bin
 
+firmware.mem:
+	make -C $(TOPDIR)/fw/imfplay_port init_image
