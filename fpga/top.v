@@ -21,12 +21,7 @@ module top
     ,input           flash_so_i
 
      // WM8750 Codec
-     ,output codec_mclk
-     ,output codec_bclk
-     ,output codec_dacdata
-     ,output codec_daclrck
      ,input  codec_adcdata
-     ,output codec_adclrck
      ,inout  codec_scl
      ,inout  codec_sda
 );
@@ -242,37 +237,10 @@ audio audio_out (
     .clk25(clk25),
     .reset25(reset25),
     .codec_bclk_i(codec_bclk_i),
-    .codec_dacdat(codec_dacdata),
-    .codec_daclrc(codec_daclrck),
-    .codec_adcdat(codec_adcdata),
-    .codec_adclrc(codec_adclrck),
     .audio_right_sample(right),
     .audio_left_sample(left),
     .audio_sample_clk(sample_clk)
 );
-
-ODDR2 mclk_buf (
-    .S(1'b0),
-    .R(1'b0),
-    .D0(1'b1),
-    .D1(1'b0),
-    .C0(clk25),
-    .C1(!clk25),
-    .CE(1'b1),
-    .Q(codec_mclk)
-);
-
-ODDR2 bclk_buf (
-    .S(1'b0),
-    .R(1'b0),
-    .D0(1'b1),
-    .D1(1'b0),
-    .C0(codec_bclk_i),
-    .C1(!codec_bclk_i),
-    .CE(1'b1),
-    .Q(codec_bclk)
-);
-
 
 
 //-----------------------------------------------------------------
